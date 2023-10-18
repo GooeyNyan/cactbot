@@ -79,8 +79,7 @@ export class TimelineUI {
     this.Reset();
 
     this.timeline = timeline;
-    if (this.timeline)
-      this.timeline.ui = this;
+    if (this.timeline) this.timeline.ui = this;
   }
 
   public OnAddTimer(_fightNow: number, _e: Event, _channeling: boolean): void {
@@ -172,7 +171,8 @@ export class Timeline {
   ) {
     this.replacements = replacements;
 
-    const lang = this.options.TimelineLanguage || this.options.ParserLanguage || 'en';
+    const lang =
+      this.options.TimelineLanguage || this.options.ParserLanguage || 'en';
     this.activeText = lang in activeText ? activeText[lang] : activeText['en'];
 
     // Not sorted.
@@ -196,7 +196,11 @@ export class Timeline {
     this.Stop();
   }
 
-  private LoadFile(text: string, triggers: LooseTimelineTrigger[], styles: TimelineStyle[]): void {
+  private LoadFile(
+    text: string,
+    triggers: LooseTimelineTrigger[],
+    styles: TimelineStyle[],
+  ): void {
     const parsed = new TimelineParser(
       text,
       this.replacements,
@@ -240,8 +244,7 @@ export class Timeline {
     const newTimebase = new Date(currentTime - fightNow * 1000).valueOf();
     // Skip syncs that are too close.  Many syncs happen on abilities that
     // hit 8 to 24 people, and so this is a lot of churn.
-    if (Math.abs(newTimebase - this.timebase) <= 2)
-      return;
+    if (Math.abs(newTimebase - this.timebase) <= 2) return;
     this.timebase = newTimebase;
 
     this.nextEventState = { ...initialNextEventState };
@@ -274,8 +277,7 @@ export class Timeline {
     this.activeSyncs = [];
     for (let i = this.nextSyncEnd; i < this.syncEnds.length; ++i) {
       const syncEnd = this.syncEnds[i];
-      if (syncEnd && syncEnd.start <= fightNow)
-        this.activeSyncs.push(syncEnd);
+      if (syncEnd && syncEnd.start <= fightNow) this.activeSyncs.push(syncEnd);
     }
 
     if (
@@ -311,7 +313,8 @@ export class Timeline {
     // This function advances time to fightNow without processing any events.
     let event = this.events[this.nextEventState.index];
     while (
-      this.nextEventState.index < this.events.length && event &&
+      this.nextEventState.index < this.events.length &&
+      event &&
       event.time + this.nextEventState.timeOffset <= fightNow
     )
       event = this.events[++this.nextEventState.index];
@@ -319,13 +322,25 @@ export class Timeline {
     while (this.nextText < this.texts.length && text && text.time <= fightNow)
       text = this.texts[++this.nextText];
     let syncStart = this.syncStarts[this.nextSyncStart];
-    while (this.nextSyncStart < this.syncStarts.length && syncStart && syncStart.start <= fightNow)
+    while (
+      this.nextSyncStart < this.syncStarts.length &&
+      syncStart &&
+      syncStart.start <= fightNow
+    )
       syncStart = this.syncStarts[++this.nextSyncStart];
     let syncEnd = this.syncEnds[this.nextSyncEnd];
-    while (this.nextSyncEnd < this.syncEnds.length && syncEnd && syncEnd.end <= fightNow)
+    while (
+      this.nextSyncEnd < this.syncEnds.length &&
+      syncEnd &&
+      syncEnd.end <= fightNow
+    )
       syncEnd = this.syncEnds[++this.nextSyncEnd];
     let forceJump = this.forceJumps[this.nextForceJump];
-    while (this.nextForceJump < this.forceJumps.length && forceJump && forceJump.time <= fightNow)
+    while (
+      this.nextForceJump < this.forceJumps.length &&
+      forceJump &&
+      forceJump.time <= fightNow
+    )
       forceJump = this.forceJumps[++this.nextForceJump];
   }
 
@@ -350,7 +365,11 @@ export class Timeline {
 
   private _RemoveExpiredTimers(fightNow: number): void {
     let activeEvent = this.activeEvents[0];
-    while (this.activeEvents.length && activeEvent && activeEvent.time <= fightNow) {
+    while (
+      this.activeEvents.length &&
+      activeEvent &&
+      activeEvent.time <= fightNow
+    ) {
       this.ui?.OnRemoveTimer(activeEvent, true);
       this.activeEvents.splice(0, 1);
       activeEvent = this.activeEvents[0];
@@ -388,8 +407,7 @@ export class Timeline {
         --i;
       }
     }
-    if (events.length)
-      Array.prototype.push.apply(this.activeEvents, events);
+    if (events.length) Array.prototype.push.apply(this.activeEvents, events);
     this.activeEvents.sort((a, b) => {
       return a.time - b.time;
     });
@@ -401,14 +419,12 @@ export class Timeline {
       this.activeEvents.length < this.options.MaxNumberOfTimerBars
     ) {
       const e = this.events[this.nextEventState.index];
-      if (e === undefined)
-        throw new UnreachableCode();
+      if (e === undefined) throw new UnreachableCode();
 
       // If we have too many bars, just hold at this next event state
       // until space frees up and we can start processing again.
       const timeUntilEvent = e.time + this.nextEventState.timeOffset - fightNow;
-      if (timeUntilEvent > this.options.ShowTimerBarsAtSeconds)
-        break;
+      if (timeUntilEvent > this.options.ShowTimerBarsAtSeconds) break;
 
       ++this.nextEventState.index;
 
@@ -441,7 +457,8 @@ export class Timeline {
         // reason, we'll be back to jumpCount=0 and normal sort keys.  Sadly, this will not
         // be true if we ever fix the duration bug across loops (see comments inline)
         // but it's a band-aid for now, sorry.  Probably HtmlTimelineUI needs smarter ordering.
-        this.nextEventState.sortKeyOffset = e.sortKey * this.nextEventState.jumpCount;
+        this.nextEventState.sortKeyOffset =
+          e.sortKey * this.nextEventState.jumpCount;
       }
     }
   }
@@ -449,18 +466,14 @@ export class Timeline {
   private _AddPassedTexts(fightNow: number, currentTime: number): void {
     while (this.nextText < this.texts.length) {
       const t = this.texts[this.nextText];
-      if (!t)
-        break;
-      if (t.time > fightNow)
-        break;
-      if (t.type === 'info')
-        this.ui?.OnShowInfoText(t.text, currentTime);
+      if (!t) break;
+      if (t.time > fightNow) break;
+      if (t.type === 'info') this.ui?.OnShowInfoText(t.text, currentTime);
       else if (t.type === 'alert')
         this.ui?.OnShowAlertText(t.text, currentTime);
       else if (t.type === 'alarm')
         this.ui?.OnShowAlarmText(t.text, currentTime);
-      else if (t.type === 'tts')
-        this.ui?.OnSpeakTTS(t.text, currentTime);
+      else if (t.type === 'tts') this.ui?.OnSpeakTTS(t.text, currentTime);
       else if (t.type === 'trigger')
         this.ui?.OnTrigger(t.trigger, t.matches, currentTime);
       ++this.nextText;
@@ -475,8 +488,6 @@ export class Timeline {
   }
 
   protected _ScheduleUpdate(fightNow: number): void {
-    console.assert(this.timebase, '_ScheduleUpdate called while stopped');
-
     let nextEventStarting = kBig;
     let nextTextOccurs = kBig;
     let nextEventEnding = kBig;
@@ -487,55 +498,35 @@ export class Timeline {
       const nextEvent = this.events[this.nextEventState.index];
       if (nextEvent) {
         const nextEventEndsAt = nextEvent.time + this.nextEventState.timeOffset;
-        console.assert(
-          nextEventStarting > fightNow,
-          'nextEvent wasn\'t updated before calling _ScheduleUpdate',
-        );
         // There might be more events than we can show, so the next event might be in
         // the past. If that happens, then ignore it, as we can't use that for our timer.
-        const showNextEventAt = nextEventEndsAt - this.options.ShowTimerBarsAtSeconds;
-        if (showNextEventAt > fightNow)
-          nextEventStarting = showNextEventAt;
+        const showNextEventAt =
+          nextEventEndsAt - this.options.ShowTimerBarsAtSeconds;
+        if (showNextEventAt > fightNow) nextEventStarting = showNextEventAt;
       }
     }
     if (this.nextText < this.texts.length) {
       const nextText = this.texts[this.nextText];
       if (nextText) {
         nextTextOccurs = nextText.time;
-        console.assert(
-          nextTextOccurs > fightNow,
-          'nextText wasn\'t updated before calling _ScheduleUpdate',
-        );
       }
     }
     if (this.activeEvents.length > 0) {
       const activeEvent = this.activeEvents[0];
       if (activeEvent) {
         nextEventEnding = activeEvent.time;
-        console.assert(
-          nextEventEnding > fightNow,
-          'Expired activeEvents weren\'t pruned before calling _ScheduleUpdate',
-        );
       }
     }
     if (this.nextSyncStart < this.syncStarts.length) {
       const syncStarts = this.syncStarts[this.nextSyncStart];
       if (syncStarts) {
         nextSyncStarting = syncStarts.start;
-        console.assert(
-          nextSyncStarting > fightNow,
-          'nextSyncStart wasn\'t updated before calling _ScheduleUpdate',
-        );
       }
     }
     if (this.nextSyncEnd < this.syncEnds.length) {
       const syncEnds = this.syncEnds[this.nextSyncEnd];
       if (syncEnds) {
         nextSyncEnding = syncEnds.end;
-        console.assert(
-          nextSyncEnding > fightNow,
-          'nextSyncEnd wasn\'t updated before calling _ScheduleUpdate',
-        );
       }
     }
 
@@ -550,10 +541,8 @@ export class Timeline {
       nextSyncStarting,
       nextSyncEnding,
     );
-    if (nextTime === kBig)
-      return;
+    if (nextTime === kBig) return;
 
-    console.assert(nextTime > fightNow, 'nextTime is in the past');
     this._CancelUpdate();
     this.updateTimer = window.setTimeout(
       () => this._OnUpdateTimer(Date.now()),
@@ -562,12 +551,12 @@ export class Timeline {
   }
 
   public _OnUpdateTimer(currentTime: number): void {
-    console.assert(this.timebase, '_OnTimerUpdate called while stopped');
     // Round to ~30ms precision to avoid micro changes of fightNow from 10 to 10.003.
     // Also round *up*, as these timers are always scheduled for the next event
     // and it doesn't make sense to schedule something for 0.8s out and then
     // round down to 0.799s and need another timer to have that text complete.
-    const fightNow = Math.ceil(32 * (currentTime - this.timebase) / 1000) / 32;
+    const fightNow =
+      Math.ceil((32 * (currentTime - this.timebase)) / 1000) / 32;
 
     // Unlike other jumps which happen "immediately", an unconditional jump may have happened
     // in the past (+/- some timer variation).  Should we just consider that the update
@@ -577,8 +566,7 @@ export class Timeline {
       const jumpSource = unconditionalJump.time;
       this._AddPassedTexts(jumpSource, currentTime);
       const jumpDest = unconditionalJump.jump;
-      if (jumpDest === undefined)
-        throw new UnreachableCode();
+      if (jumpDest === undefined) throw new UnreachableCode();
       const offset = fightNow - jumpSource;
       this.SyncTo(jumpDest, currentTime - offset);
 
@@ -610,8 +598,7 @@ export class Timeline {
 
   public _CheckUnconditionalJump(fightNow: number): Sync | undefined {
     const forceJump = this.forceJumps[this.nextForceJump];
-    if (forceJump && forceJump.time <= fightNow)
-      return forceJump;
+    if (forceJump && forceJump.time <= fightNow) return forceJump;
   }
 }
 
@@ -632,8 +619,7 @@ export class TimelineController {
 
     this.timelines = {};
     for (const [filename, file] of Object.entries(raidbossDataFiles)) {
-      if (!filename.endsWith('.txt') || typeof file !== 'string')
-        continue;
+      if (!filename.endsWith('.txt') || typeof file !== 'string') continue;
       this.timelines[filename] = file;
     }
 
@@ -650,15 +636,12 @@ export class TimelineController {
     // Wipe lines come before combat is false, but because OnLogEvent doesn't process
     // lines when out of combat, suppress any engages that come before the next countdown
     // just as a safety, especially for old ARR content where wipe lines don't happen.
-    if (!inCombat)
-      this.suppressNextEngage = true;
-    if (!inCombat && this.activeTimeline)
-      this.activeTimeline.Stop();
+    if (!inCombat) this.suppressNextEngage = true;
+    if (!inCombat && this.activeTimeline) this.activeTimeline.Stop();
   }
 
   public OnLogEvent(e: LogEvent): void {
-    if (!this.activeTimeline)
-      return;
+    if (!this.activeTimeline) return;
 
     const currentTime = Date.now();
 
@@ -666,11 +649,12 @@ export class TimelineController {
       if (LocaleRegex.countdownStart[this.options.ParserLanguage].test(log)) {
         // As you can't start a countdown while in combat, the next engage is real.
         this.suppressNextEngage = false;
-      } else if (LocaleRegex.countdownEngage[this.options.ParserLanguage].test(log)) {
+      } else if (
+        LocaleRegex.countdownEngage[this.options.ParserLanguage].test(log)
+      ) {
         // If we see an engage after a wipe, but before combat has started otherwise
         // (e.g. countdown > wipe > face pull > engage), don't process this engage line
-        if (this.suppressNextEngage)
-          continue;
+        if (this.suppressNextEngage) continue;
       } else if (this.wipeRegex.test(log)) {
         // If we see a wipe, ignore the next engage.  If we see a countdown before that wipe,
         // we will clear this.  Therefore, this will only apply to active countdowns.
@@ -695,14 +679,11 @@ export class TimelineController {
     // Get the text from each file in |timelineFiles|.
     for (const timelineFile of timelineFiles) {
       const name = this.timelines[timelineFile];
-      if (name !== undefined)
-        text = `${text}\n${name}`;
-      else
-        console.log(`Timeline file not found: ${timelineFile}`);
+      if (name !== undefined) text = `${text}\n${name}`;
+      else console.log(`Timeline file not found: ${timelineFile}`);
     }
     // Append text from each block in |timelines|.
-    for (const timeline of timelines)
-      text = `${text}\n${timeline}`;
+    for (const timeline of timelines) text = `${text}\n${timeline}`;
 
     if (text) {
       this.activeTimeline = new Timeline(

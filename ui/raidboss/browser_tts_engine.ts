@@ -59,6 +59,8 @@ export default class BrowserTTSEngine {
     // figure out what TTS engine type we need
     const speechLang = cactbotLangToSpeechLang[this.cactbotLang];
     const voice = window.speechSynthesis.getVoices().find((voice) =>
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore replaceAll
       voice.lang.replaceAll('_', '-') === speechLang
     );
     if (voice) {

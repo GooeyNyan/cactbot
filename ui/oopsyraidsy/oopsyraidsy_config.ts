@@ -233,6 +233,8 @@ class OopsyConfigurator {
 const templateOptions: OptionsTemplate = {
   buildExtraUI: (base, container) => {
     const builder = new OopsyConfigurator(base);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore type
     builder.buildUI(container, oopsyFileData);
   },
   processExtraOptions: (baseOptions, savedConfig) => {

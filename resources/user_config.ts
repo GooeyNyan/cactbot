@@ -37,16 +37,16 @@ const ZoneInfo = _ZoneInfo;
 
 // Convince TypeScript and eslint that these are used.  TypeScript doesn't have a great way
 // to disable individual rules, so this is safer than disabling all rules.
-console.assert(Conditions);
-console.assert(ContentType);
-console.assert(NetRegexes);
-console.assert(Regexes);
-console.assert(Responses);
-console.assert(Outputs);
-console.assert(Util);
-console.assert(Directions);
-console.assert(ZoneId);
-console.assert(ZoneInfo);
+
+
+
+
+
+
+
+
+
+
 
 // TODO: move all of these to config.js?
 export type UserFileCallback = (
@@ -121,7 +121,7 @@ class UserConfig {
 
   evalUserFile(content: string, options: BaseOptions): void {
     const Options = options;
-    console.assert(Options); // Used by eval.
+    
 
     // This is the one eval cactbot should ever need, which is for handling user files.
     // Because user files can be located anywhere on disk and there's backwards compat

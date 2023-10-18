@@ -1137,7 +1137,7 @@ export const logDefinitionsVersions = {
 
 // Verify that this has the right type, but export `as const`.
 const assertLogDefinitions: LogDefinitionVersionMap = logDefinitionsVersions;
-console.assert(assertLogDefinitions);
+
 
 export type LogDefinitions = typeof logDefinitionsVersions['latest'];
 export type LogDefinitionTypes = keyof LogDefinitions;

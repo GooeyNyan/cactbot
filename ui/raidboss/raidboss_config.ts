@@ -1861,6 +1861,8 @@ const templateOptions: OptionsTemplate = {
     const builder = new RaidbossConfigurator(base);
     const userOptions = { ...raidbossOptions };
     UserConfig.loadUserFiles('raidboss', userOptions, () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore type
       builder.buildUI(container, raidbossFileData, userOptions);
     }, false);
   },

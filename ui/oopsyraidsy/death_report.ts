@@ -26,7 +26,10 @@ import {
 // * consolidate multiple damage that killed (e.g. Solemn Confiteor x4) into summary text
 // * maybe if a player is fully healed, trim abilities before that?
 
-const processAbilityLine = (splitLine: string[]) => {
+export const processAbilityLine = (
+  splitLine: string[],
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Record<string, any> => {
   const flagIdx = logDefinitions.Ability.fields.flags;
   let flags = splitLine[flagIdx] ?? '';
   let damage = splitLine[flagIdx + 1] ?? '';
@@ -86,8 +89,7 @@ export class DeathReport {
     // Walk backward through events until we find the last damage or a death reason.
     for (let i = data.events.length - 1; i >= 0; i--) {
       const event = data.events[i];
-      if (!event)
-        break;
+      if (!event) break;
       if (event.type === 'DeathReason') {
         return {
           type: 'death',
@@ -102,8 +104,11 @@ export class DeathReport {
       if (event.type === 'Ability') {
         const ability = processAbilityLine(event.splitLine);
         if (ability.isAttack && ability.amount > 0) {
-          const abilityName = event.splitLine[logDefinitions.Ability.fields.ability] ?? '???';
-          const currentHp = event.splitLine[logDefinitions.Ability.fields.targetCurrentHp] ?? '???';
+          const abilityName =
+            event.splitLine[logDefinitions.Ability.fields.ability] ?? '???';
+          const currentHp =
+            event.splitLine[logDefinitions.Ability.fields.targetCurrentHp] ??
+            '???';
           const text = `${abilityName} (${ability.amount}/${currentHp})`;
           return {
             type: 'death',
@@ -127,8 +132,7 @@ export class DeathReport {
   // The base timestamp it is relative to is generally the start of the fight.
   makeRelativeTimeString(timestamp: number): string {
     const base = this.baseTimestamp;
-    if (!base)
-      return '';
+    if (!base) return '';
     const deltaMs = timestamp - base;
     const prefix = deltaMs < 0 ? '-' : '';
     const deltaTotalSeconds = Math.round(Math.abs(deltaMs) / 1000);
@@ -140,8 +144,7 @@ export class DeathReport {
   // Lazily do some work to process the tracked lines from `this.events` into something that
   // can be displayed to the user.  This is the model for the live/summary views.
   public parseReportLines(): ParsedDeathReportLine[] {
-    if (this.parsedReportLines)
-      return this.parsedReportLines;
+    if (this.parsedReportLines) return this.parsedReportLines;
 
     this.parsedReportLines = [];
 
@@ -151,21 +154,17 @@ export class DeathReport {
 
     for (const event of this.events) {
       let parsed: ParsedDeathReportLine | undefined = undefined;
-      if (event.type === 'Ability')
-        parsed = this.processAbility(event);
-      else if (event.type === 'HoTDoT')
-        parsed = this.processHoTDoT(event);
+      if (event.type === 'Ability') parsed = this.processAbility(event);
+      else if (event.type === 'HoTDoT') parsed = this.processHoTDoT(event);
       else if (event.type === 'MissedAbility' || event.type === 'MissedEffect')
         parsed = this.processMissedBuff(event);
-      else if (event.type === 'Mistake')
-        parsed = this.processMistake(event);
+      else if (event.type === 'Mistake') parsed = this.processMistake(event);
       else if (event.type === 'DeathReason')
         parsed = this.processDeathReason(event);
 
       // After this point, we will always append this event,
       // but still have some post-processing to do.
-      if (!parsed)
-        continue;
+      if (!parsed) continue;
 
       if (
         event.type === 'Ability' &&
@@ -217,7 +216,8 @@ export class DeathReport {
 
   processGainsEffect(event: TrackedLineEvent): ParsedDeathReportLine {
     // TODO: we also need to filter effects that we don't care about, e.g. swiftcast?
-    const effectName = event.splitLine[logDefinitions.GainsEffect.fields.effect] ?? '???';
+    const effectName =
+      event.splitLine[logDefinitions.GainsEffect.fields.effect] ?? '???';
 
     const text = Translate(this.lang, {
       en: `Gain: ${effectName}`,
@@ -237,7 +237,8 @@ export class DeathReport {
 
   processLosesEffect(event: TrackedLineEvent): ParsedDeathReportLine {
     // TODO: we also need to filter effects that we don't care about, e.g. swiftcast?
-    const effectName = event.splitLine[logDefinitions.LosesEffect.fields.effect] ?? '???';
+    const effectName =
+      event.splitLine[logDefinitions.LosesEffect.fields.effect] ?? '???';
 
     const text = Translate(this.lang, {
       en: `Lose: ${effectName}`,
@@ -255,13 +256,14 @@ export class DeathReport {
     };
   }
 
-  private processAbility(event: TrackedLineEvent): ParsedDeathReportLine | undefined {
+  private processAbility(
+    event: TrackedLineEvent,
+  ): ParsedDeathReportLine | undefined {
     const splitLine = event.splitLine;
     const ability = processAbilityLine(splitLine);
 
     // Zero damage abilities can be noisy and don't contribute much information, so skip.
-    if (ability.amount === 0)
-      return;
+    if (ability.amount === 0) return;
 
     let amount;
 
@@ -269,21 +271,28 @@ export class DeathReport {
     let amountStr: string | undefined;
     if (ability.isHeal) {
       amountClass = 'heal';
-      amountStr = ability.amount > 0 ? `+${ability.amount.toString()}` : ability.amount.toString();
+      amountStr =
+        ability.amount > 0
+          ? `+${ability.amount.toString()}`
+          : ability.amount.toString();
       amount = ability.amount;
     } else if (ability.isAttack) {
       amountClass = 'damage';
-      amountStr = ability.amount > 0 ? `-${ability.amount.toString()}` : ability.amount.toString();
+      amountStr =
+        ability.amount > 0
+          ? `-${ability.amount.toString()}`
+          : ability.amount.toString();
       amount = -1 * ability.amount;
     }
 
     // Ignore abilities that are not damage or heals.  Any important abilities should generate an
     // effect.
-    if (amountClass === undefined || amountStr === undefined)
-      return;
+    if (amountClass === undefined || amountStr === undefined) return;
 
-    const abilityName = splitLine[logDefinitions.Ability.fields.ability] ?? '???';
-    const currentHpStr = splitLine[logDefinitions.Ability.fields.targetCurrentHp];
+    const abilityName =
+      splitLine[logDefinitions.Ability.fields.ability] ?? '???';
+    const currentHpStr =
+      splitLine[logDefinitions.Ability.fields.targetCurrentHp];
     const currentHp = currentHpStr !== undefined ? parseInt(currentHpStr) : 0;
     return {
       timestamp: event.timestamp,
@@ -298,14 +307,18 @@ export class DeathReport {
     };
   }
 
-  private processHoTDoT(event: TrackedLineEvent): ParsedDeathReportLine | undefined {
+  private processHoTDoT(
+    event: TrackedLineEvent,
+  ): ParsedDeathReportLine | undefined {
     const which = event.splitLine[logDefinitions.NetworkDoT.fields.which];
     const isHeal = which === 'HoT';
 
     // Note: this amount is just raw bytes, and not the UnscrambleDamage version.
-    let amount = parseInt(event.splitLine[logDefinitions.NetworkDoT.fields.damage] ?? '', 16);
-    if (amount <= 0)
-      return;
+    let amount = parseInt(
+      event.splitLine[logDefinitions.NetworkDoT.fields.damage] ?? '',
+      16,
+    );
+    if (amount <= 0) return;
 
     let amountClass: string;
     let amountStr: string;
@@ -318,7 +331,8 @@ export class DeathReport {
       amount *= -1;
     }
 
-    const currentHpStr = event.splitLine[logDefinitions.NetworkDoT.fields.currentHp];
+    const currentHpStr =
+      event.splitLine[logDefinitions.NetworkDoT.fields.currentHp];
     const currentHp = currentHpStr !== undefined ? parseInt(currentHpStr) : 0;
 
     // TODO: this line has an effect id, but we don't have an id -> string mapping for all ids.
@@ -336,7 +350,9 @@ export class DeathReport {
     };
   }
 
-  private processMissedBuff(event: TrackedLineEvent): ParsedDeathReportLine | undefined {
+  private processMissedBuff(
+    event: TrackedLineEvent,
+  ): ParsedDeathReportLine | undefined {
     let buffName: string | undefined;
     let sourceName: string | undefined;
 
@@ -348,8 +364,7 @@ export class DeathReport {
       sourceName = event.splitLine[logDefinitions.GainsEffect.fields.source];
     }
 
-    if (buffName === undefined || sourceName === undefined)
-      return;
+    if (buffName === undefined || sourceName === undefined) return;
 
     const text = Translate(this.lang, {
       en: `Missed ${buffName} (${sourceName})`,
@@ -368,7 +383,9 @@ export class DeathReport {
     };
   }
 
-  private processMistake(event: TrackedMistakeEvent): ParsedDeathReportLine | undefined {
+  private processMistake(
+    event: TrackedMistakeEvent,
+  ): ParsedDeathReportLine | undefined {
     const mistake = event.mistakeEvent;
     const triggerType = mistake.triggerType;
 
@@ -393,7 +410,9 @@ export class DeathReport {
     };
   }
 
-  private processDeathReason(event: TrackedDeathReasonEvent): ParsedDeathReportLine | undefined {
+  private processDeathReason(
+    event: TrackedDeathReasonEvent,
+  ): ParsedDeathReportLine | undefined {
     return {
       timestamp: event.timestamp,
       timestampStr: this.makeRelativeTimeString(event.timestamp),

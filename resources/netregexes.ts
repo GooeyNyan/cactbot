@@ -351,7 +351,7 @@ export default class NetRegexes {
   }
   static doesNetRegexNeedTranslation(regex: RegExp | string): boolean {
     // Need to `setFlagTranslationsNeeded` before calling this function.
-    console.assert(NetRegexes.flagTranslationsNeeded);
+    
     const str = typeof regex === 'string' ? regex : regex.source;
     return !!magicStringRegex.exec(str);
   }

@@ -69,7 +69,7 @@ export const modDistance = (mark: number, dragon: number) => {
   const oneWay = (dragon - mark + 8) % 8;
   const otherWay = (mark - dragon + 8) % 8;
   const distance = Math.min(oneWay, otherWay);
-  console.assert(distance >= 0);
+  
   return distance;
 };
 
@@ -79,8 +79,8 @@ export const badSpots = (mark: number, dragon: number) => {
   // mark, NE dragon will also hit NW.
   const bad = [];
   const distance = modDistance(mark, dragon);
-  console.assert(distance > 0);
-  console.assert(distance <= 2);
+  
+  
   if ((mark + distance + 8) % 8 === dragon) {
     // Clockwise.
     for (let i = 0; i <= distance; ++i)

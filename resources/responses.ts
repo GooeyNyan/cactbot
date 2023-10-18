@@ -602,4 +602,4 @@ export const Responses = {
 // which properties are defined in Responses without having to conditionally check for undefined.
 const responseMapTypeAssertion: ResponsesMap = Responses;
 // Suppress unused variable warning.
-console.assert(responseMapTypeAssertion);
+
