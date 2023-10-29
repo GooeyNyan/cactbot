@@ -28,14 +28,16 @@ import {
 
 export const processAbilityLine = (
   splitLine: string[],
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Record<string, any> => {
-  const flagIdx = logDefinitions.Ability.fields.flags;
+  let flagIdx = logDefinitions.Ability.fields.flags;
   let flags = splitLine[flagIdx] ?? '';
   let damage = splitLine[flagIdx + 1] ?? '';
-  if (kShiftFlagValues.includes(flags)) {
-    flags = splitLine[flagIdx + 2] ?? flags;
-    damage = splitLine[flagIdx + 3] ?? damage;
+
+  while (kShiftFlagValues.includes(flags)) {
+    flagIdx += 2;
+    flags = splitLine[flagIdx] ?? flags;
+    damage = splitLine[flagIdx + 1] ?? damage;
   }
 
   const amount = UnscrambleDamage(damage);

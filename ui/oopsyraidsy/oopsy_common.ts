@@ -10,7 +10,17 @@ export const kFieldDamage = 9;
 // If kFieldFlags is any of these values, then consider field 10/11 as 8/9.
 // It appears a little bit that flags come in pairs of values, but it's unclear
 // what these mean.
-export const kShiftFlagValues = ['3E', '113', '213', '313'];
+export const kShiftFlagValues = [
+  '3E',
+  '113',
+  '213',
+  '313',
+  'E',
+  '3C',
+  '3F',
+  'A10',
+  '100000E',
+];
 export const kFlagInstantDeath = '36'; // Always 36 ?
 // miss, damage, block, parry, instant death
 export const kAttackFlags = ['01', '03', '05', '06', kFlagInstantDeath];
@@ -95,26 +105,28 @@ export const ShortNamify = (
 ): string => {
   // TODO: make this unique among the party in case of first name collisions.
   // TODO: probably this should be a general cactbot utility.
-  if (name === undefined)
-    return '???';
+  if (name === undefined) return '???';
 
   const nick = playerNicks[name];
-  if (nick !== undefined)
-    return nick;
+  if (nick !== undefined) return nick;
 
   const idx = name.indexOf(' ');
   return idx < 0 ? name : name.slice(0, idx);
 };
 
-export const Translate = (lang: Lang, obj?: LocaleText | string): string | undefined => {
-  if (typeof obj !== 'object')
-    return obj;
+export const Translate = (
+  lang: Lang,
+  obj?: LocaleText | string,
+): string | undefined => {
+  if (typeof obj !== 'object') return obj;
   return obj[lang] ?? obj['en'];
 };
 
-export const GetFormattedTime = (baseTime: number | undefined, time: number): string => {
-  if (!baseTime)
-    return '';
+export const GetFormattedTime = (
+  baseTime: number | undefined,
+  time: number,
+): string => {
+  if (!baseTime) return '';
   const totalSeconds = Math.floor((time - baseTime) / 1000);
   const seconds = totalSeconds % 60;
   const minutes = Math.floor(totalSeconds / 60);
@@ -125,11 +137,9 @@ export const GetFormattedTime = (baseTime: number | undefined, time: number): st
 // Since fields are modified in place right now, this does nothing if called
 // again with an integer.  This is kind of a hack, sorry.
 export const UnscrambleDamage = (field?: string): number => {
-  if (field === undefined)
-    return 0;
+  if (field === undefined) return 0;
   const len = field.length;
-  if (len <= 4)
-    return 0;
+  if (len <= 4) return 0;
   // Get the left two bytes as damage.
   let damage = parseInt(field.slice(0, len - 4), 16);
   // Check for third byte == 0x40.
@@ -142,25 +152,28 @@ export const UnscrambleDamage = (field?: string): number => {
 };
 
 export const IsPlayerId = (id?: string): boolean => {
-  if (id === undefined)
-    return false;
+  if (id === undefined) return false;
   const firstChar = id[0];
   return firstChar !== undefined ? firstChar < '4' : false;
 };
 
-export const IsTriggerEnabled = (options: OopsyOptions, id: string): boolean => {
-  if (id in options.DisabledTriggers)
-    return false;
+export const IsTriggerEnabled = (
+  options: OopsyOptions,
+  id: string,
+): boolean => {
+  if (id in options.DisabledTriggers) return false;
 
   const autoConfig = options.PerTriggerAutoConfig[id];
-  if (autoConfig)
-    return autoConfig.enabled;
+  if (autoConfig) return autoConfig.enabled;
 
   return true;
 };
 
-export const GetSoloMistakeText = (ability: string | LocaleText): LocaleText => {
-  const localeText: LocaleText = typeof ability === 'string' ? { en: ability } : ability;
+export const GetSoloMistakeText = (
+  ability: string | LocaleText,
+): LocaleText => {
+  const localeText: LocaleText =
+    typeof ability === 'string' ? { en: ability } : ability;
   return {
     en: `${localeText['en']} (alone)`,
     de: `${localeText['de'] ?? localeText['en']} (allein)`,
@@ -175,7 +188,8 @@ export const GetShareMistakeText = (
   ability: string | LocaleText,
   numTargets: number,
 ): LocaleText => {
-  const localeText: LocaleText = typeof ability === 'string' ? { en: ability } : ability;
+  const localeText: LocaleText =
+    typeof ability === 'string' ? { en: ability } : ability;
   return {
     en: `${localeText['en']} (share x${numTargets})`,
     de: `${localeText['de'] ?? localeText['en']} (geteilt mit ${numTargets})`,
