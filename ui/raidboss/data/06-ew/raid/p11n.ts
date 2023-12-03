@@ -166,7 +166,7 @@ const triggerSet: TriggerSet<Data> = {
       netRegex: { id: '01CF' },
       infoText: (data, matches, output) => {
         if (data.me !== matches.target)
-          return output.avoidCleave!({ target: data.ShortName(matches.target) });
+          return output.avoidCleave!({ target: data.party.member(matches.target) });
         return output.cleaveOnYou!();
       },
       outputStrings: {
@@ -192,7 +192,9 @@ const triggerSet: TriggerSet<Data> = {
       id: 'P11N Upheld Ruling Chariot',
       type: 'HeadMarker',
       netRegex: { id: '013E' },
-      infoText: (data, matches, output) => output.text!({ target: data.ShortName(matches.target) }),
+      infoText: (data, matches, output) => {
+        return output.text!({ target: data.party.member(matches.target) });
+      },
       outputStrings: {
         text: {
           en: 'Stack on ${target} -> get out',
@@ -359,6 +361,41 @@ const triggerSet: TriggerSet<Data> = {
         'Sigils of Discord': '失调的判纹',
         'Styx': '仇恨',
         'Upheld Ruling': '维持判决',
+      },
+    },
+    {
+      'locale': 'ko',
+      'replaceSync': {
+        'Illusory Themis': '테미스의 환영',
+        '(?<!(-| ))Themis': '테미스',
+      },
+      'replaceText': {
+        '\\(random\\)': '(랜덤)',
+        '\\(cast\\)': '(시전)',
+        '\\(puddle': '(장판',
+        '\\(in/out\\)': '(안/밖)',
+        'dynamo\\)': '도넛)',
+        'chariot\\)': '원형)',
+        '\\(cleave': '(탱버',
+        '\\(stack': '(쉐어',
+        'Blinding Light': '빛 폭탄',
+        'Dark Perimeter': '어둠의 둘레',
+        'Dark and Light': '빛과 어둠의 조정',
+        'Dike': '디케',
+        'Dineis': '디네',
+        'Dismissal Ruling': '퇴거 집행',
+        'Divine Ruination': '빛의 폭발',
+        'Divisive Ruling': '분할 집행',
+        'Emissary\'s Will': '조정',
+        'Eunomia': '에우노미아',
+        'Inner Light': '내면의 빛',
+        'Lightburst': '빛 분출',
+        'Outer Dark': '외면의 어둠',
+        'Ripples of Gloom': '어둠의 충격',
+        'Shadowed Messengers': '계율의 환영',
+        'Sigils of Discord': '부조화의 인장',
+        'Styx': '스틱스',
+        'Upheld Ruling': '확정 집행',
       },
     },
   ],

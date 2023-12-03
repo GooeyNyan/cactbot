@@ -128,59 +128,70 @@ This guide was last updated for:
     - [Regexes](#regexes-21)
     - [Examples](#examples-21)
   - [Line 37 (0x25): NetworkActionSync](#line-37-0x25-networkactionsync)
-  - [Line 38 (0x26): NetworkStatusEffects](#line-38-0x26-networkstatuseffects)
     - [Structure](#structure-22)
     - [Regexes](#regexes-22)
     - [Examples](#examples-22)
-  - [Line 39 (0x27): NetworkUpdateHP](#line-39-0x27-networkupdatehp)
+  - [Line 38 (0x26): NetworkStatusEffects](#line-38-0x26-networkstatuseffects)
     - [Structure](#structure-23)
     - [Regexes](#regexes-23)
     - [Examples](#examples-23)
-  - [Line 40 (0x28): Map](#line-40-0x28-map)
+  - [Line 39 (0x27): NetworkUpdateHP](#line-39-0x27-networkupdatehp)
     - [Structure](#structure-24)
     - [Regexes](#regexes-24)
     - [Examples](#examples-24)
-  - [Line 41 (0x29): SystemLogMessage](#line-41-0x29-systemlogmessage)
+  - [Line 40 (0x28): Map](#line-40-0x28-map)
     - [Structure](#structure-25)
     - [Regexes](#regexes-25)
     - [Examples](#examples-25)
-  - [Line 42 (0x2A): StatusList3](#line-42-0x2a-statuslist3)
+  - [Line 41 (0x29): SystemLogMessage](#line-41-0x29-systemlogmessage)
     - [Structure](#structure-26)
     - [Regexes](#regexes-26)
     - [Examples](#examples-26)
+  - [Line 42 (0x2A): StatusList3](#line-42-0x2a-statuslist3)
+    - [Structure](#structure-27)
+    - [Regexes](#regexes-27)
+    - [Examples](#examples-27)
   - [Line 251 (0xFB): Debug](#line-251-0xfb-debug)
   - [Line 252 (0xFC): PacketDump](#line-252-0xfc-packetdump)
   - [Line 253 (0xFD): Version](#line-253-0xfd-version)
   - [Line 254 (0xFE): Error](#line-254-0xfe-error)
 - [OverlayPlugin Log Lines](#overlayplugin-log-lines)
   - [Line 256 (0x100): LineRegistration](#line-256-0x100-lineregistration)
-    - [Structure](#structure-27)
-    - [Regexes](#regexes-27)
-    - [Examples](#examples-27)
-  - [Line 257 (0x101): MapEffect](#line-257-0x101-mapeffect)
     - [Structure](#structure-28)
     - [Regexes](#regexes-28)
     - [Examples](#examples-28)
-  - [Line 258 (0x102): FateDirector](#line-258-0x102-fatedirector)
+  - [Line 257 (0x101): MapEffect](#line-257-0x101-mapeffect)
     - [Structure](#structure-29)
     - [Regexes](#regexes-29)
     - [Examples](#examples-29)
-  - [Line 259 (0x103): CEDirector](#line-259-0x103-cedirector)
+  - [Line 258 (0x102): FateDirector](#line-258-0x102-fatedirector)
     - [Structure](#structure-30)
     - [Regexes](#regexes-30)
     - [Examples](#examples-30)
-  - [Line 260 (0x104): InCombat](#line-260-0x104-incombat)
+  - [Line 259 (0x103): CEDirector](#line-259-0x103-cedirector)
     - [Structure](#structure-31)
     - [Regexes](#regexes-31)
     - [Examples](#examples-31)
-  - [Line 261 (0x105): CombatantMemory](#line-261-0x105-combatantmemory)
+  - [Line 260 (0x104): InCombat](#line-260-0x104-incombat)
     - [Structure](#structure-32)
     - [Regexes](#regexes-32)
     - [Examples](#examples-32)
-  - [Line 262 (0x106): RSVData](#line-262-0x106-rsvdata)
+  - [Line 261 (0x105): CombatantMemory](#line-261-0x105-combatantmemory)
     - [Structure](#structure-33)
     - [Regexes](#regexes-33)
     - [Examples](#examples-33)
+  - [Line 262 (0x106): RSVData](#line-262-0x106-rsvdata)
+    - [Structure](#structure-34)
+    - [Regexes](#regexes-34)
+    - [Examples](#examples-34)
+  - [Line 263 (0x107): StartsUsingExtra](#line-263-0x107-startsusingextra)
+    - [Structure](#structure-35)
+    - [Regexes](#regexes-35)
+    - [Examples](#examples-35)
+  - [Line 264 (0x108): AbilityExtra](#line-264-0x108-abilityextra)
+    - [Structure](#structure-36)
+    - [Regexes](#regexes-36)
+    - [Examples](#examples-36)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
 ## Data Flow
@@ -1708,6 +1719,8 @@ This log line is for tethers between enemies or enemies and players.
 This does not appear to be used for player to player skill tethers like dragonsight or cover.
 (It can be used for enemy-inflicted player to player tethers such as burning chains in Shinryu N/EX.)
 
+The `id` parameter is an id into the [Channeling table](https://github.com/xivapi/ffxiv-datamining/blob/master/csv/Channeling.csv).
+
 <!-- AUTO-GENERATED-CONTENT:START (logLines:type=Tether&lang=en-US) -->
 
 #### Structure
@@ -1834,14 +1847,43 @@ at the moment the action is "locked in".
 > It would help though if I did, but ACT doesn't do multi-line parsing very easily,
 > so I would need to do a lot of work-arounds."
 
-Structure:
-`25:[Player ObjectId]:[Sequence Number]:[Current HP]:[Max HP]:[Current MP]:[Max MP]:[Current TP]:[Max TP]:[Position X]:[Position Y]:[Position Z]:[Facing]:[packet data thereafter]`
+<!-- AUTO-GENERATED-CONTENT:START (logLines:type=NetworkEffectResult&lang=en-US) -->
 
-Examples:
+#### Structure
 
 ```log
-25:12345678:PlayerOne:0000132A:33635:35817:10000:10000:0::0.3841706:-207.8767:2.901163:-3.00212:03E8:2500:0:01:03000000:0:0:E0000000:
+Network Log Line Structure:
+37|[timestamp]|[id]|[name]|[sequenceId]|[currentHp]|[maxHp]|[currentMp]|[maxMp]|[currentShield]|[?]|[x]|[y]|[z]|[heading]
+
+Parsed Log Line Structure:
+[timestamp] EffectResult 25:[id]:[name]:[sequenceId]:[currentHp]:[maxHp]:[currentMp]:[maxMp]:[currentShield]:[?]:[x]:[y]:[z]:[heading]
 ```
+
+#### Regexes
+
+```log
+Network Log Line Regex:
+^(?<type>37)\|(?<timestamp>[^|]*)\|(?<id>[^|]*)\|(?<name>[^|]*)\|(?<sequenceId>[^|]*)\|(?<currentHp>[^|]*)\|(?<maxHp>[^|]*)\|(?<currentMp>[^|]*)\|(?<maxMp>[^|]*)\|(?<currentShield>[^|]*)\|(?:[^|]*\|)(?<x>[^|]*)\|(?<y>[^|]*)\|(?<z>[^|]*)\|(?<heading>[^|]*)\|
+
+Parsed Log Line Regex:
+(?<timestamp>^.{14}) EffectResult (?<type>25):(?<id>[^:]*):(?<name>[^:]*):(?<sequenceId>[^:]*):(?<currentHp>[^:]*):(?<maxHp>[^:]*):(?<currentMp>[^:]*):(?<maxMp>[^:]*):(?<currentShield>[^:]*):[^:]*:(?<x>[^:]*):(?<y>[^:]*):(?<z>[^:]*):(?<heading>[^:]*)(?:$|:)
+```
+
+#### Examples
+
+```log
+Network Log Line Examples:
+37|2023-10-31T10:08:51.4080000-07:00|10FF0001|Tini Poutini|0000003A|117941|117941|10000|10000|0||-660.17|-842.23|29.75|-1.61|1500|0|0|01|5B|0|0|10755CA3|19aff167ea86b371
+37|2023-10-31T22:11:04.8350000-07:00|10FF0002|Potato Chippy|00005AE1|0|88095|0|10000|0||8.61|15.22|0.00|2.69|1E00|0|0|01|0400002C|0|0|E0000000|ef1e0399980c0f47
+37|2023-10-31T22:10:49.5860000-07:00|4000C5B2|Ketuduke|00005AD6|7452804||||||-0.02|-0.02|0.00|1.98|27ee18f38f377d5d
+
+Parsed Log Line Examples:
+[10:08:51.408] EffectResult 25:10FF0001:Tini Poutini:0000003A:117941:117941:10000:10000:0::-660.17:-842.23:29.75:-1.61:1500:0:0:01:5B:0:0:10755CA3
+[22:11:04.835] EffectResult 25:10FF0002:Potato Chippy:00005AE1:0:88095:0:10000:0::8.61:15.22:0.00:2.69:1E00:0:0:01:0400002C:0:0:E0000000
+[22:10:49.586] EffectResult 25:4000C5B2:Ketuduke:00005AD6:7452804::::::-0.02:-0.02:0.00:1.98
+```
+
+<!-- AUTO-GENERATED-CONTENT:END -->
 
 <a name="line38"></a>
 
@@ -1858,20 +1900,20 @@ and [NetworkActionSync](#line37).
 
 ```log
 Network Log Line Structure:
-38|[timestamp]|[targetId]|[target]|[jobLevelData]|[hp]|[maxHp]|[mp]|[maxMp]|[?]|[?]|[x]|[y]|[z]|[heading]|[data0]|[data1]|[data2]|[data3]|[data4]|[data5]
+38|[timestamp]|[targetId]|[target]|[jobLevelData]|[hp]|[maxHp]|[mp]|[maxMp]|[currentShield]|[?]|[x]|[y]|[z]|[heading]|[data0]|[data1]|[data2]|[data3]|[data4]|[data5]
 
 Parsed Log Line Structure:
-[timestamp] StatusList 26:[targetId]:[target]:[jobLevelData]:[hp]:[maxHp]:[mp]:[maxMp]:[?]:[?]:[x]:[y]:[z]:[heading]:[data0]:[data1]:[data2]:[data3]:[data4]:[data5]
+[timestamp] StatusList 26:[targetId]:[target]:[jobLevelData]:[hp]:[maxHp]:[mp]:[maxMp]:[currentShield]:[?]:[x]:[y]:[z]:[heading]:[data0]:[data1]:[data2]:[data3]:[data4]:[data5]
 ```
 
 #### Regexes
 
 ```log
 Network Log Line Regex:
-^(?<type>38)\|(?<timestamp>[^|]*)\|(?<targetId>[^|]*)\|(?<target>[^|]*)\|(?<jobLevelData>[^|]*)\|(?<hp>[^|]*)\|(?<maxHp>[^|]*)\|(?<mp>[^|]*)\|(?<maxMp>[^|]*)\|(?:[^|]*\|){2}(?<x>[^|]*)\|(?<y>[^|]*)\|(?<z>[^|]*)\|(?<heading>[^|]*)\|(?<data0>[^|]*)\|(?<data1>[^|]*)\|(?<data2>[^|]*)\|
+^(?<type>38)\|(?<timestamp>[^|]*)\|(?<targetId>[^|]*)\|(?<target>[^|]*)\|(?<jobLevelData>[^|]*)\|(?<hp>[^|]*)\|(?<maxHp>[^|]*)\|(?<mp>[^|]*)\|(?<maxMp>[^|]*)\|(?<currentShield>[^|]*)\|(?:[^|]*\|)(?<x>[^|]*)\|(?<y>[^|]*)\|(?<z>[^|]*)\|(?<heading>[^|]*)\|(?<data0>[^|]*)\|(?<data1>[^|]*)\|(?<data2>[^|]*)\|
 
 Parsed Log Line Regex:
-(?<timestamp>^.{14}) StatusList (?<type>26):(?<targetId>[^:]*):(?<target>[^:]*):(?<jobLevelData>[^:]*):(?<hp>[^:]*):(?<maxHp>[^:]*):(?<mp>[^:]*):(?<maxMp>[^:]*)(?::[^:]*){2}:(?<x>[^:]*):(?<y>[^:]*):(?<z>[^:]*):(?<heading>[^:]*):(?<data0>[^:]*):(?<data1>[^:]*):(?<data2>[^:]*)(?:$|:)
+(?<timestamp>^.{14}) StatusList (?<type>26):(?<targetId>[^:]*):(?<target>[^:]*):(?<jobLevelData>[^:]*):(?<hp>[^:]*):(?<maxHp>[^:]*):(?<mp>[^:]*):(?<maxMp>[^:]*):(?<currentShield>[^:]*):[^:]*:(?<x>[^:]*):(?<y>[^:]*):(?<z>[^:]*):(?<heading>[^:]*):(?<data0>[^:]*):(?<data1>[^:]*):(?<data2>[^:]*)(?:$|:)
 ```
 
 #### Examples
@@ -2424,6 +2466,12 @@ This log line tracks in combat state.
 which may include other people around you and not yourself
 and also takes your ACT encounter settings into consideration.
 
+`isACTChanged` and `isGameChanged` represent whether the state has changed
+since the last log line.
+This allows triggers to be written for when a particular one changes,
+as lines are emitted if either changes.
+These are both true the first time the log is written.
+
 OverlayPlugin uses `inACTCombat` to re-split your encounters during import
 based on how they were split when they were originally recorded.
 
@@ -2433,34 +2481,34 @@ based on how they were split when they were originally recorded.
 
 ```log
 Network Log Line Structure:
-260|[timestamp]|[inACTCombat]|[inGameCombat]
+260|[timestamp]|[inACTCombat]|[inGameCombat]|[isACTChanged]|[isGameChanged]
 
 Parsed Log Line Structure:
-[timestamp] 260 104:[inACTCombat]:[inGameCombat]
+[timestamp] 260 104:[inACTCombat]:[inGameCombat]:[isACTChanged]:[isGameChanged]
 ```
 
 #### Regexes
 
 ```log
 Network Log Line Regex:
-^(?<type>260)\|(?<timestamp>[^|]*)\|(?<inACTCombat>[^|]*)\|(?<inGameCombat>[^|]*)\|
+^(?<type>260)\|(?<timestamp>[^|]*)\|(?<inACTCombat>[^|]*)\|(?<inGameCombat>[^|]*)\|(?<isACTChanged>[^|]*)\|(?<isGameChanged>[^|]*)\|
 
 Parsed Log Line Regex:
-(?<timestamp>^.{14}) 260 (?<type>104):(?<inACTCombat>[^:]*):(?<inGameCombat>[^:]*)(?:$|:)
+(?<timestamp>^.{14}) 260 (?<type>104):(?<inACTCombat>[^:]*):(?<inGameCombat>[^:]*):(?<isACTChanged>[^:]*):(?<isGameChanged>[^:]*)(?:$|:)
 ```
 
 #### Examples
 
 ```log
 Network Log Line Examples:
-260|2023-01-03T10:17:15.8240000-08:00|0|0|7da9e0cfed11abfe
-260|2023-01-03T17:51:42.9680000-08:00|1|0|ae12d0898d923251
-260|2023-01-03T17:54:50.0680000-08:00|1|1|3ba06c97a4cbbf42
+260|2023-01-03T10:17:15.8240000-08:00|0|0|1|1|7da9e0cfed11abfe
+260|2023-01-03T17:51:42.9680000-08:00|1|0|0|1|ae12d0898d923251
+260|2023-01-03T17:54:50.0680000-08:00|1|1|1|0|3ba06c97a4cbbf42
 
 Parsed Log Line Examples:
-[10:17:15.824] 260 104:0:0
-[17:51:42.968] 260 104:1:0
-[17:54:50.068] 260 104:1:1
+[10:17:15.824] 260 104:0:0:1:1
+[17:51:42.968] 260 104:1:0:0:1
+[17:54:50.068] 260 104:1:1:1:0
 ```
 
 <!-- AUTO-GENERATED-CONTENT:END (logLines:type=InCombat&lang=en-US) -->
@@ -2584,3 +2632,138 @@ Parsed Log Line Examples:
 ```
 
 <!-- AUTO-GENERATED-CONTENT:END (logLines:type=RSVData&lang=en-US) -->
+
+<a name="line263"></a>
+
+### Line 263 (0x107): StartsUsingExtra
+
+This line contains extra data for ActorCast/StartsUsing network data.
+
+This line is always output for a given StartsUsing cast.
+
+If the ability is non-targeted, `x`/`y`/`z`/`heading` will be the source actor's position
+and heading data.
+
+If the ability is actor-targeted, then `x`/`y`/`z` will be the target actor's current
+position, and `heading` will be the angle from the source actor to the target actor.
+
+If the ability purely targets the ground (such as BLU Bomb Toss), then
+`x`/`y`/`z`/`heading` be the position data for the target location.
+
+If the ability purely targets a direction (such as BLU Aqua Breath), then  `x`/`y`/`z`
+will be the source actor's position, while `heading` is the direction in which the
+ability was cast.
+
+Note that the important part is how the ability is *targeted*, not its actual AoE
+type. For example, Pneuma hits everything in a line, as if it were targeting a direction.
+However, it is targeted on an actor, and if said actor moves during the cast, then the
+cast will "follow" the target. Thus, if the ability has a target (and the target is
+neither the caster nor the environment), then the actual location of the target is a
+better indication of where it will hit.
+
+<!-- AUTO-GENERATED-CONTENT:START (logLines:type=StartsUsingExtra&lang=en-US) -->
+
+#### Structure
+
+```log
+Network Log Line Structure:
+263|[timestamp]|[sourceId]|[id]|[x]|[y]|[z]|[heading]
+
+Parsed Log Line Structure:
+[timestamp] 263 107:[sourceId]:[id]:[x]:[y]:[z]:[heading]
+```
+
+#### Regexes
+
+```log
+Network Log Line Regex:
+^(?<type>263)\|(?<timestamp>[^|]*)\|(?<sourceId>[^|]*)\|(?<id>[^|]*)\|(?<x>[^|]*)\|(?<y>[^|]*)\|(?<z>[^|]*)\|
+
+Parsed Log Line Regex:
+(?<timestamp>^.{14}) 263 (?<type>107):(?<sourceId>[^:]*):(?<id>[^:]*):(?<x>[^:]*):(?<y>[^:]*):(?<z>[^:]*)(?:$|:)
+```
+
+#### Examples
+
+```log
+Network Log Line Examples:
+263|2023-11-02T20:53:52.1900000-04:00|10001234|0005|-98.697|-102.359|10.010|1.524|dd76513d3dd59f5a
+263|2023-11-02T21:39:18.6200000-04:00|10001234|0085|-6.653|747.154|130.009|2.920|39e0326a5ee47b77
+263|2023-11-02T21:39:12.6940000-04:00|40000D6E|8C45|-14.344|748.558|130.009|-3.142|9c7e421d4e93de7c
+
+Parsed Log Line Examples:
+[20:53:52.190] 263 107:10001234:0005:-98.697:-102.359:10.010:1.524
+[21:39:18.620] 263 107:10001234:0085:-6.653:747.154:130.009:2.920
+[21:39:12.694] 263 107:40000D6E:8C45:-14.344:748.558:130.009:-3.142
+```
+
+<!-- AUTO-GENERATED-CONTENT:END (logLines:type=StartsUsingExtra&lang=en-US) -->
+
+<a name="line264"></a>
+
+### Line 264 (0x108): AbilityExtra
+
+This line contains extra data for Ability/NetworkAOEAbility network data.
+
+This line is always output for a given Ability hit, regardless of if that Ability hit had
+a corresponding StartsUsing line.
+
+If the ability has no target, or is single-target, the `dataFlag` value will be `0`,
+and the `x`/`y`/`z`/`heading` fields will be blank.
+
+If the ability targets the ground, for example `Asylum`/`Sacred Soil`/caster LB3, the
+`dataFlag` value will be `1` and the `x`/`y`/`z`/`heading` fields will correspond to the
+ground target location and heading of the ability target.
+
+If the ability targets a direction (such as line/cone AoEs), then the `x/y/z` will be the
+source actor's position, while `heading` is the direction that the ability is casting
+towards.
+
+If there is some sort of error related to parsing this data from the network packet,
+`dataFlag` will be `256`, and the `x`/`y`/`z`/`heading` fields will be blank.
+
+`globalEffectCounter` is equivalent to `sequence` field in
+[NetworkAbility](#line-21-0x15-networkability) and
+[NetworkAOEAbility](#line-22-0x16-networkaoeability).
+
+Note that unlike [StartsUsingExtra](#line-263-0x107-startsusingextra), you do not need
+to worry about whether or not there is an actor target, as this represents the final
+snapshotted location of the Ability.
+
+<!-- AUTO-GENERATED-CONTENT:START (logLines:type=AbilityExtra&lang=en-US) -->
+
+#### Structure
+
+```log
+Network Log Line Structure:
+264|[timestamp]|[sourceId]|[id]|[globalEffectCounter]|[dataFlag]|[x]|[y]|[z]|[heading]
+
+Parsed Log Line Structure:
+[timestamp] 264 108:[sourceId]:[id]:[globalEffectCounter]:[dataFlag]:[x]:[y]:[z]:[heading]
+```
+
+#### Regexes
+
+```log
+Network Log Line Regex:
+^(?<type>264)\|(?<timestamp>[^|]*)\|(?<sourceId>[^|]*)\|(?<id>[^|]*)\|(?<globalEffectCounter>[^|]*)\|(?<dataFlag>[^|]*)\|(?<x>[^|]*)\|(?<y>[^|]*)\|(?<z>[^|]*)\|
+
+Parsed Log Line Regex:
+(?<timestamp>^.{14}) 264 (?<type>108):(?<sourceId>[^:]*):(?<id>[^:]*):(?<globalEffectCounter>[^:]*):(?<dataFlag>[^:]*):(?<x>[^:]*):(?<y>[^:]*):(?<z>[^:]*)(?:$|:)
+```
+
+#### Examples
+
+```log
+Network Log Line Examples:
+264|2023-11-02T20:53:56.6450000-04:00|10001234|0005|000003EF|0|||||9f7371fa0e3a42c8
+264|2023-11-02T21:39:20.0910000-04:00|10001234|0085|0000533E|1|0.000|0.000|0.000|2.920|2e9ae29c1b65f930
+264|2023-11-02T21:39:15.6790000-04:00|40000D6E|8C45|000052DD|1|-14.344|748.558|130.009|2.483|f6b3ffa6c97f0540
+
+Parsed Log Line Examples:
+[20:53:56.645] 264 108:10001234:0005:000003EF:0::::
+[21:39:20.091] 264 108:10001234:0085:0000533E:1:0.000:0.000:0.000:2.920
+[21:39:15.679] 264 108:40000D6E:8C45:000052DD:1:-14.344:748.558:130.009:2.483
+```
+
+<!-- AUTO-GENERATED-CONTENT:END (logLines:type=AbilityExtra&lang=en-US) -->

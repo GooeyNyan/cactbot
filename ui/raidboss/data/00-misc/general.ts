@@ -25,7 +25,9 @@ const triggerSet: TriggerSet<Data> = {
           return false;
         return caresAboutTankStuff(data);
       },
-      infoText: (data, matches, output) => output.text!({ player: data.ShortName(matches.source) }),
+      infoText: (data, matches, output) => {
+        return output.text!({ player: data.party.member(matches.source) });
+      },
       outputStrings: {
         text: {
           en: 'Provoke: ${player}',
@@ -52,8 +54,8 @@ const triggerSet: TriggerSet<Data> = {
       suppressSeconds: 0.5,
       infoText: (data, matches, output) => {
         if (matches.targetId === 'E0000000')
-          return output.noTarget!({ player: data.ShortName(matches.source) });
-        return output.text!({ player: data.ShortName(matches.source) });
+          return output.noTarget!({ player: data.party.member(matches.source) });
+        return output.text!({ player: data.party.member(matches.source) });
       },
       outputStrings: {
         text: {
@@ -86,7 +88,8 @@ const triggerSet: TriggerSet<Data> = {
           return false;
         return caresAboutTankStuff(data);
       },
-      infoText: (data, matches, output) => output.text!({ player: data.ShortName(matches.source) }),
+      infoText: (data, matches, output) =>
+        output.text!({ player: data.party.member(matches.source) }),
       outputStrings: {
         text: {
           en: 'Shirk: ${player}',
@@ -110,7 +113,8 @@ const triggerSet: TriggerSet<Data> = {
           return false;
         return caresAboutTankStuff(data);
       },
-      infoText: (data, matches, output) => output.text!({ player: data.ShortName(matches.source) }),
+      infoText: (data, matches, output) =>
+        output.text!({ player: data.party.member(matches.source) }),
       outputStrings: {
         text: {
           en: 'Holmgang: ${player}',
@@ -134,7 +138,8 @@ const triggerSet: TriggerSet<Data> = {
           return false;
         return caresAboutTankStuff(data);
       },
-      infoText: (data, matches, output) => output.text!({ player: data.ShortName(matches.source) }),
+      infoText: (data, matches, output) =>
+        output.text!({ player: data.party.member(matches.source) }),
       outputStrings: {
         text: {
           en: 'Hallowed: ${player}',
@@ -158,7 +163,8 @@ const triggerSet: TriggerSet<Data> = {
           return false;
         return caresAboutTankStuff(data);
       },
-      infoText: (data, matches, output) => output.text!({ player: data.ShortName(matches.source) }),
+      infoText: (data, matches, output) =>
+        output.text!({ player: data.party.member(matches.source) }),
       outputStrings: {
         text: {
           en: 'Bolide: ${player}',
@@ -182,7 +188,8 @@ const triggerSet: TriggerSet<Data> = {
           return false;
         return caresAboutTankStuff(data);
       },
-      infoText: (data, matches, output) => output.text!({ player: data.ShortName(matches.source) }),
+      infoText: (data, matches, output) =>
+        output.text!({ player: data.party.member(matches.source) }),
       outputStrings: {
         text: {
           en: 'Living: ${player}',
@@ -206,7 +213,8 @@ const triggerSet: TriggerSet<Data> = {
           return false;
         return caresAboutTankStuff(data);
       },
-      infoText: (data, matches, output) => output.text!({ player: data.ShortName(matches.source) }),
+      infoText: (data, matches, output) =>
+        output.text!({ player: data.party.member(matches.source) }),
       outputStrings: {
         text: {
           en: 'Walking: ${player}',

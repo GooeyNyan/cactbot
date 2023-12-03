@@ -139,12 +139,12 @@ const triggerSet: TriggerSet<Data> = {
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
-          en: 'Watch Tethered Dog',
+          en: 'Stand behind tethered dog',
           de: 'Achte auf den verbundenen Hund',
-          fr: 'Regardez le chien lié',
-          ja: '線で繋がった分身を注視',
-          cn: '找连线的狗',
-          ko: '연결된 쫄 지켜보기',
+          fr: 'Allez derrière le chien lié',
+          ja: '線で繋がった分身を注視', // FIXME
+          cn: '站在连线狗后',
+          ko: '연결된 쫄 뒤로가기',
         },
       },
     },

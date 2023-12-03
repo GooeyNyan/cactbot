@@ -34,6 +34,7 @@ const triggerSet: TriggerSet<Data> = {
         en: 'Output for "/echo cactbot test config"',
         de: 'Ausgabe für "/echo cactbot test config"',
         fr: 'Sortie pour "/echo cactbot test config"',
+        ja: '"/echo cactbot test config"のアウトプット',
         cn: '输出 "/echo cactbot测试配置"',
         ko: '"/echo cactbot 설정 테스트" 출력값',
       },
@@ -69,7 +70,7 @@ const triggerSet: TriggerSet<Data> = {
     },
     (data) => {
       return [
-        `40 "Death To ${data.ShortName(data.me)}!!"`,
+        `40 "Death To ${data.me}!!"`,
         'hideall "Death"',
       ];
     },
@@ -324,6 +325,7 @@ const triggerSet: TriggerSet<Data> = {
           en: 'Config Value: ${value}',
           de: 'Einstellungswert: ${value}',
           fr: 'Valeur de configuration : ${value}',
+          ja: '設定: ${value}',
           cn: '配置值: ${value}',
           ko: '설정값: ${value}',
         },
@@ -357,8 +359,33 @@ const triggerSet: TriggerSet<Data> = {
           en: 'ID ${id} is casting spell ID ${spellId}',
           de: 'ID ${id} wirkt Zauber ID ${spellId}',
           fr: 'ID ${id} incante le sort ID ${spellId}',
+          ja: 'ID ${id} スペルID ${spellId}を詠唱中',
           cn: 'ID ${id} 正在施法 ID ${spellId}',
           ko: 'ID ${id}: 스킬 ID ${spellId}를 시전하는 중',
+        },
+      },
+    },
+    {
+      id: 'Test OutputStrings',
+      type: 'GameLog',
+      netRegex: {
+        line: 'cactbot test outputStrings',
+        code: Util.gameLogCodes.echo,
+        capture: false,
+      },
+      infoText: (data, _matches, output) => {
+        // TODO: This doesn't work unless you're in a party, because party tracker is empty.
+        // OverlayPlugin should probably always return the current player as being in the party
+        // regardless of the rest of the party composition.
+        return output.text!({ player: data.party.member(data.me) });
+      },
+      outputStrings: {
+        text: {
+          en: 'player = ${player}, player.job = ${player.job}, player.bogus = ${player.bogus}',
+          de: 'player = ${player}, player.job = ${player.job}, player.bogus = ${player.bogus}',
+          ja: 'player = ${player}, player.job = ${player.job}, player.bogus = ${player.bogus}',
+          cn: 'player = ${player}, player.job = ${player.job}, player.bogus = ${player.bogus}',
+          ko: 'player = ${player}, player.job = ${player.job}, player.bogus = ${player.bogus}',
         },
       },
     },
@@ -366,6 +393,7 @@ const triggerSet: TriggerSet<Data> = {
   timelineReplace: [
     {
       locale: 'de',
+      missingTranslations: true,
       replaceSync: {
         'You bid farewell to the striking dummy': 'Du winkst der Trainingspuppe zum Abschied zu',
         'You bow courteously to the striking dummy':
@@ -376,6 +404,7 @@ const triggerSet: TriggerSet<Data> = {
         'cactbot test response': 'cactbot test antwort',
         'cactbot test watch': 'cactbot test beobachten',
         'cactbot test config': 'cactbot test konfig',
+        'cactbot test outputStrings': 'cactbot test outputStrings',
         'cactbot test combatant cast': 'cactbot test gegner wirken',
         'You clap for the striking dummy': 'Du klatschst begeistert Beifall für die Trainingspuppe',
         'You psych yourself up alongside the striking dummy':
@@ -404,6 +433,7 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       locale: 'fr',
+      missingTranslations: true,
       replaceSync: {
         'cactbot lang': 'cactbot langue',
         'cactbot test response': 'cactbot test de réponse',
@@ -446,6 +476,7 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       locale: 'ja',
+      missingTranslations: true,
       replaceSync: {
         'You bid farewell to the striking dummy': '.*は木人に別れの挨拶をした',
         'You bow courteously to the striking dummy': '.*は木人にお辞儀した',
@@ -456,6 +487,7 @@ const triggerSet: TriggerSet<Data> = {
         'cactbot test watch': 'cactbot探知テスト',
         'cactbot test config': 'cactbot設定テスト',
         'cactbot test combatant cast': 'cactbotターゲットキャストテスト',
+        'cactbot test outputStrings': 'cactbot outputStrings テスト',
         'You clap for the striking dummy': '.*は木人に拍手した',
         'You psych yourself up alongside the striking dummy': '.*は木人に活を入れた',
         'You poke the striking dummy': '.*は木人をつついた',
@@ -483,6 +515,7 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       locale: 'cn',
+      missingTranslations: true,
       replaceSync: {
         'You bid farewell to the striking dummy': '.*向木人告别',
         'You bow courteously to the striking dummy': '.*恭敬地对木人行礼',
@@ -491,6 +524,7 @@ const triggerSet: TriggerSet<Data> = {
         'cactbot lang': 'cactbot语言',
         'cactbot test combatant cast': 'cactbot测试战斗员施法',
         'cactbot test config': 'cactbot测试配置',
+        'cactbot test outputStrings': 'cactbot测试输出字符串',
         'cactbot test response': 'cactbot响应测试',
         'cactbot test watch': 'cactbot探测测试',
         'You clap for the striking dummy': '.*向木人送上掌声',
@@ -520,6 +554,7 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       locale: 'ko',
+      missingTranslations: true,
       replaceSync: {
         'You bid farewell to the striking dummy': '.*나무인형에게 작별 인사를 합니다',
         'You bow courteously to the striking dummy': '.*나무인형에게 공손하게 인사합니다',
@@ -530,6 +565,7 @@ const triggerSet: TriggerSet<Data> = {
         'cactbot test response': 'cactbot 응답 테스트',
         'cactbot test watch': 'cactbot 탐지 테스트',
         'cactbot test combatant cast': 'cactbot 스킬 시전 테스트',
+        'cactbot test outputStrings': 'cactbot outputStrings 테스트',
         'You clap for the striking dummy': '.*나무인형에게 박수를 보냅니다',
         'You psych yourself up alongside the striking dummy': '.*나무인형에게 힘을 불어넣습니다',
         'You poke the striking dummy': '.*나무인형을 쿡쿡 찌릅니다',

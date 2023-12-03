@@ -1,3 +1,4 @@
+import NetRegexes from '../../resources/netregexes';
 import { addOverlayListener, callOverlayHandler } from '../../resources/overlay_plugin_api';
 
 import '../../resources/defaults.css';
@@ -127,9 +128,6 @@ addOverlayListener('onPlayerChangedEvent', (e) => {
   const rotation = document.getElementById('rotation');
   if (rotation)
     rotation.innerText = e.detail.rotation.toString();
-  const bait = document.getElementById('bait');
-  if (bait)
-    bait.innerText = e.detail.bait.toString();
 });
 
 addOverlayListener('EnmityTargetData', (e) => {
@@ -152,26 +150,26 @@ addOverlayListener('onGameActiveChangedEvent', (_e) => {
   // console.log("Game active: " + e.detail.active);
 });
 
-addOverlayListener('onLogEvent', (e) => {
-  e.detail.logs.forEach((log) => {
-    // Match "/echo tts:<stuff>"
-    const r = /00:0038:tts:(.*)/.exec(log);
-    const text = r?.[1];
-    if (text !== undefined) {
-      void callOverlayHandler({
-        call: 'cactbotSay',
-        text: text,
-      });
-    }
-  });
+const ttsEchoRegex = NetRegexes.echo({ line: 'tts:.*?' });
+addOverlayListener('LogLine', (e) => {
+  // Match "/echo tts:<stuff>"
+  const line = ttsEchoRegex.exec(e.rawLine)?.groups?.line;
+  if (line === undefined)
+    return;
+  const colon = line.indexOf(':');
+  if (colon === -1)
+    return;
+  const text = line.slice(colon);
+  if (text !== undefined) {
+    void callOverlayHandler({
+      call: 'cactbotSay',
+      text: text,
+    });
+  }
 });
 
 addOverlayListener('onUserFileChanged', (e) => {
   console.log(`User file ${e.file} changed!`);
-});
-
-addOverlayListener('FileChanged', (e) => {
-  console.log(`File ${e.file} changed!`);
 });
 
 void callOverlayHandler({ call: 'cactbotRequestState' });

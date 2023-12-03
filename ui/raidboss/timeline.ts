@@ -1,7 +1,7 @@
 import { commonNetRegex } from '../../resources/netregexes';
 import { UnreachableCode } from '../../resources/not_reached';
 import { LocaleRegex } from '../../resources/translations';
-import { LogEvent } from '../../types/event';
+import { EventResponses, LogEvent } from '../../types/event';
 import { CactbotBaseRegExp } from '../../types/net_trigger';
 import { LooseTimelineTrigger, RaidbossFileData } from '../../types/trigger';
 
@@ -43,6 +43,9 @@ import {
 // place in the timeline).
 //
 // There's also no testing, sorry.
+
+// TODO: we should also refactor uses of `window` out of here and maybe into
+// set/clear timeout wrappers in html_timeline_ui as well.
 
 const kBig = 1000000000; // Something bigger than any fight length in seconds.
 
@@ -86,7 +89,7 @@ export class TimelineUI {
     /* noop */
   }
 
-  public OnRemoveTimer(_e: Event, _expired: boolean, _force = false): void {
+  public OnRemoveTimer(_e: Event, _force = false): void {
     /* noop */
   }
 
@@ -133,7 +136,12 @@ export class Timeline {
   private activeText: string;
 
   protected activeSyncs: Sync[];
+  protected activeNetSyncs: Sync[];
   private activeEvents: Event[];
+  private keepAliveEvents: {
+    event: Event;
+    timeout: number;
+  }[];
   private activeLastForceJumpSync?: Sync;
 
   public ignores: { [ignoreId: string]: boolean };
@@ -177,8 +185,11 @@ export class Timeline {
 
     // Not sorted.
     this.activeSyncs = [];
+    this.activeNetSyncs = [];
     // Sorted by event occurrence time.
     this.activeEvents = [];
+    // Events that are no longer active but we are keeping on screen briefly.
+    this.keepAliveEvents = [];
     // A set of names which will not be notified about.
     this.ignores = {};
     // Sorted by event occurrence time.
@@ -275,9 +286,15 @@ export class Timeline {
 
   private _CollectActiveSyncs(fightNow: number): void {
     this.activeSyncs = [];
+    this.activeNetSyncs = [];
     for (let i = this.nextSyncEnd; i < this.syncEnds.length; ++i) {
       const syncEnd = this.syncEnds[i];
-      if (syncEnd && syncEnd.start <= fightNow) this.activeSyncs.push(syncEnd);
+      if (syncEnd && syncEnd.start <= fightNow) {
+        if (syncEnd.regexType === 'parsed')
+          this.activeSyncs.push(syncEnd);
+        else
+          this.activeNetSyncs.push(syncEnd);
+      }
     }
 
     if (
@@ -285,25 +302,41 @@ export class Timeline {
       this.activeLastForceJumpSync.start <= fightNow &&
       this.activeLastForceJumpSync.end > fightNow
     ) {
-      this.activeSyncs.push(this.activeLastForceJumpSync);
+      if (this.activeLastForceJumpSync.regexType === 'parsed')
+        this.activeSyncs.push(this.activeLastForceJumpSync);
+      else
+        this.activeNetSyncs.push(this.activeLastForceJumpSync);
     } else {
       this.activeLastForceJumpSync = undefined;
+    }
+  }
+
+  public OnLogLineJump(sync: Sync, currentTime: number): void {
+    if ('jump' in sync) {
+      if (!sync.jump) {
+        this.SyncTo(0, currentTime, sync);
+        this.Stop();
+      } else {
+        this.SyncTo(sync.jump, currentTime, sync);
+      }
+    } else {
+      this.SyncTo(sync.time, currentTime, sync);
     }
   }
 
   public OnLogLine(line: string, currentTime: number): void {
     for (const sync of this.activeSyncs) {
       if (sync.regex.test(line)) {
-        if ('jump' in sync) {
-          if (!sync.jump) {
-            this.SyncTo(0, currentTime, sync);
-            this.Stop();
-          } else {
-            this.SyncTo(sync.jump, currentTime, sync);
-          }
-        } else {
-          this.SyncTo(sync.time, currentTime, sync);
-        }
+        this.OnLogLineJump(sync, currentTime);
+        break;
+      }
+    }
+  }
+
+  public OnNetLogLine(line: string, currentTime: number): void {
+    for (const sync of this.activeNetSyncs) {
+      if (sync.regex.test(line)) {
+        this.OnLogLineJump(sync, currentTime);
         break;
       }
     }
@@ -348,6 +381,10 @@ export class Timeline {
     for (const activeEvent of this.activeEvents)
       this.ui?.OnRemoveTimer(activeEvent, false);
     this.activeEvents = [];
+    for (const keepAlive of this.keepAliveEvents) {
+      window.clearTimeout(keepAlive.timeout);
+      this.ui?.OnRemoveTimer(keepAlive.event, false);
+    }
   }
 
   private _ClearExceptRunningDurationTimers(fightNow: number): void {
@@ -357,20 +394,46 @@ export class Timeline {
         durationEvents.push(event);
         continue;
       }
-      this.ui?.OnRemoveTimer(event, false, true);
+      this.ui?.OnRemoveTimer(event, true);
     }
+    // Do not clear keep alive events here, as this is part of a sync jump
+    // and keep alive timing is independent of timeline time.
 
     this.activeEvents = durationEvents;
   }
 
   private _RemoveExpiredTimers(fightNow: number): void {
     let activeEvent = this.activeEvents[0];
-    while (
-      this.activeEvents.length &&
-      activeEvent &&
-      activeEvent.time <= fightNow
-    ) {
-      this.ui?.OnRemoveTimer(activeEvent, true);
+    while (this.activeEvents.length && activeEvent && activeEvent.time <= fightNow) {
+      const event = activeEvent;
+      if (typeof window !== 'undefined' && this.options.KeepExpiredTimerBarsForSeconds > 0) {
+        this.keepAliveEvents.push({
+          event: event,
+          timeout: window.setTimeout(
+            () => {
+              // Find and remove the first keepalive event with this id.
+              let found = false;
+              this.keepAliveEvents = this.keepAliveEvents.filter((x) => {
+                if (found)
+                  return true;
+                if (x.event.id === event.id) {
+                  found = true;
+                  return false;
+                }
+                return true;
+              });
+              this.ui?.OnRemoveTimer(event, false);
+              // Because keepalive events are in "real time" just update the timer
+              // whenever any has been removed in case more bars need to be added.
+              this._OnUpdateTimer(Date.now());
+            },
+            this.options.KeepExpiredTimerBarsForSeconds * 1000,
+          ),
+        });
+      } else {
+        this.ui?.OnRemoveTimer(activeEvent, false);
+      }
+
       this.activeEvents.splice(0, 1);
       activeEvent = this.activeEvents[0];
     }
@@ -402,7 +465,7 @@ export class Timeline {
         };
         events.push(durationEvent);
         this.activeEvents.splice(i, 1);
-        this.ui?.OnRemoveTimer(e, false, true);
+        this.ui?.OnRemoveTimer(e, true);
         this.ui?.OnAddTimer(fightNow, durationEvent, true);
         --i;
       }
@@ -416,7 +479,7 @@ export class Timeline {
   private _AddUpcomingTimers(fightNow: number): void {
     while (
       this.nextEventState.index < this.events.length &&
-      this.activeEvents.length < this.options.MaxNumberOfTimerBars
+      this.activeEvents.length + this.keepAliveEvents.length < this.options.MaxNumberOfTimerBars
     ) {
       const e = this.events[this.nextEventState.index];
       if (e === undefined) throw new UnreachableCode();
@@ -662,6 +725,16 @@ export class TimelineController {
       }
       this.activeTimeline.OnLogLine(log, currentTime);
     }
+  }
+
+  OnNetLog(e: EventResponses['LogLine']): void {
+    if (!this.activeTimeline)
+      return;
+
+    const currentTime = Date.now();
+
+    // TODO: Check for the countdown => wipe => engage logic for network lines
+    this.activeTimeline.OnNetLogLine(e.rawLine, currentTime);
   }
 
   public SetActiveTimeline(

@@ -381,16 +381,7 @@ export default class Regexes {
    * matches: https://github.com/quisquous/cactbot/blob/main/docs/LogGuide.md#line-03-0x03-addcombatant
    */
   static addedCombatant(params?: NetParams['AddedCombatant']): CactbotBaseRegExp<'AddedCombatant'> {
-    return parseHelper(
-      params,
-      'AddedCombatant',
-      defaultParams('AddedCombatant', Regexes.logVersion, [
-        'type',
-        'timestamp',
-        'id',
-        'name',
-      ]),
-    );
+    return buildRegex('AddedCombatant', params);
   }
 
   /**
@@ -399,7 +390,7 @@ export default class Regexes {
   static addedCombatantFull(
     params?: NetParams['AddedCombatant'],
   ): CactbotBaseRegExp<'AddedCombatant'> {
-    return buildRegex('AddedCombatant', params);
+    return this.addedCombatant(params);
   }
 
   /**
@@ -576,6 +567,24 @@ export default class Regexes {
     params?: NetParams['CombatantMemory'],
   ): CactbotBaseRegExp<'CombatantMemory'> {
     return buildRegex('CombatantMemory', params);
+  }
+
+  /**
+   * matches: https://github.com/quisquous/cactbot/blob/main/docs/LogGuide.md#line-263-0x107-startsusingextra
+   */
+  static startsUsingExtra(
+    params?: NetParams['StartsUsingExtra'],
+  ): CactbotBaseRegExp<'StartsUsingExtra'> {
+    return buildRegex('StartsUsingExtra', params);
+  }
+
+  /**
+   * matches: https://github.com/quisquous/cactbot/blob/main/docs/LogGuide.md#line-264-0x108-abilityextra
+   */
+  static abilityExtra(
+    params?: NetParams['AbilityExtra'],
+  ): CactbotBaseRegExp<'AbilityExtra'> {
+    return buildRegex('AbilityExtra', params);
   }
 
   /**

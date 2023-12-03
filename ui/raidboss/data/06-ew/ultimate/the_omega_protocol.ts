@@ -182,6 +182,8 @@ const triggerSet: TriggerSet<Data> = {
           '<a href="https://github.com/quisquous/cactbot/releases/tag/v0.28.19" target="_blank">Read Notes</a>',
         de:
           '<a href="https://github.com/quisquous/cactbot/releases/tag/v0.28.19" target="_blank">Notizen lesen</a>',
+        ja:
+          '<a href="https://github.com/quisquous/cactbot/releases/tag/v0.28.19" target="_blank">ノート参考</a>',
         cn:
           '<a href="https://github.com/quisquous/cactbot/releases/tag/v0.28.19" target="_blank">阅读笔记</a>',
         ko:
@@ -384,7 +386,7 @@ const triggerSet: TriggerSet<Data> = {
             break;
           }
         }
-        return output.text!({ num: myNum, player: data.ShortName(partner) });
+        return output.text!({ num: myNum, player: data.party.member(partner) });
       },
       outputStrings: {
         text: {
@@ -751,10 +753,10 @@ const triggerSet: TriggerSet<Data> = {
         }
 
         return {
-          circle: output.circle!({ glitch: glitch, player: data.ShortName(partner) }),
-          triangle: output.triangle!({ glitch: glitch, player: data.ShortName(partner) }),
-          square: output.square!({ glitch: glitch, player: data.ShortName(partner) }),
-          cross: output.cross!({ glitch: glitch, player: data.ShortName(partner) }),
+          circle: output.circle!({ glitch: glitch, player: data.party.member(partner) }),
+          triangle: output.triangle!({ glitch: glitch, player: data.party.member(partner) }),
+          square: output.square!({ glitch: glitch, player: data.party.member(partner) }),
+          cross: output.cross!({ glitch: glitch, player: data.party.member(partner) }),
         }[myMarker];
       },
       outputStrings: {
@@ -768,6 +770,7 @@ const triggerSet: TriggerSet<Data> = {
         remoteGlitch: {
           en: 'Far',
           de: 'Fern',
+          ja: 'ファー',
           cn: '远',
           ko: '멀리',
         },
@@ -867,6 +870,7 @@ const triggerSet: TriggerSet<Data> = {
           stacksOn: {
             en: '${glitch} Stacks (${player1}, ${player2})',
             de: '${glitch} Sammeln (${player1}, ${player2})',
+            ja: '${glitch} 頭割り (${player1}, ${player2})',
             cn: '${glitch} 分摊 (${player1}, ${player2})',
             ko: '${glitch} 쉐어 (${player1}, ${player2})',
           },
@@ -890,8 +894,8 @@ const triggerSet: TriggerSet<Data> = {
 
         const stacksOn = output.stacksOn!({
           glitch: glitch,
-          player1: data.ShortName(p1),
-          player2: data.ShortName(p2),
+          player1: data.party.member(p1),
+          player2: data.party.member(p2),
         });
         if (!data.spotlightStacks.includes(data.me))
           return { infoText: stacksOn };
@@ -1018,9 +1022,9 @@ const triggerSet: TriggerSet<Data> = {
             opposites.push(name);
         }
 
-        const partnerText = output.sameDebuffPartner!({ player: data.ShortName(partner) });
+        const partnerText = output.sameDebuffPartner!({ player: data.party.member(partner) });
 
-        const [p1, p2] = opposites.sort().map((x) => data.ShortName(x));
+        const [p1, p2] = opposites.sort().map((x) => data.party.member(x));
         if (myBuff === 'stack')
           return { alertText: output.stack!({ player1: p1, player2: p2 }), infoText: partnerText };
         return {
@@ -1432,7 +1436,7 @@ const triggerSet: TriggerSet<Data> = {
         data.monitorPlayers = [];
 
         if (players.includes(data.me)) {
-          const [p1, p2] = players.filter((x) => x !== data.me).map((x) => data.ShortName(x));
+          const [p1, p2] = players.filter((x) => x !== data.me).map((x) => data.party.member(x));
           return { alertText: output.monitorOnYou!({ player1: p1, player2: p2 }) };
         }
         return { infoText: output.unmarked!() };
@@ -1478,11 +1482,14 @@ const triggerSet: TriggerSet<Data> = {
         const onYou = p1 === data.me || p2 === data.me;
         if (onYou) {
           const otherPerson = p1 === data.me ? p2 : p1;
-          return { alertText: output.stackOnYou!({ player: data.ShortName(otherPerson) }) };
+          return { alertText: output.stackOnYou!({ player: data.party.member(otherPerson) }) };
         }
 
         return {
-          infoText: output.stacks!({ player1: data.ShortName(p1), player2: data.ShortName(p2) }),
+          infoText: output.stacks!({
+            player1: data.party.member(p1),
+            player2: data.party.member(p2),
+          }),
         };
       },
       run: (data, _matches) => data.waveCannonStacks = [],
@@ -2775,7 +2782,6 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'ja',
-      'missingTranslations': true,
       'replaceSync': {
         'Alpha Omega': 'アルファオメガ',
         'Cosmo Meteor': 'コスモメテオ',

@@ -457,15 +457,15 @@ const triggerSet: TriggerSet<Data> = {
         if (duration > data.daemonicBondsTime) {
           data.bondsSecondMechanic = 'stack';
           return output.spreadThenStack!({
-            player1: data.ShortName(data.tetradaemonicTarget[0]),
-            player2: data.ShortName(data.tetradaemonicTarget[1]),
+            player1: data.party.member(data.tetradaemonicTarget[0]),
+            player2: data.party.member(data.tetradaemonicTarget[1]),
           });
         }
 
         data.bondsSecondMechanic = 'spread';
         return output.stackThenSpread!({
-          player1: data.ShortName(data.tetradaemonicTarget[0]),
-          player2: data.ShortName(data.tetradaemonicTarget[1]),
+          player1: data.party.member(data.tetradaemonicTarget[0]),
+          player2: data.party.member(data.tetradaemonicTarget[1]),
         });
       },
       outputStrings: {
@@ -499,8 +499,8 @@ const triggerSet: TriggerSet<Data> = {
         // We can't make this a `condition` as this is not known until after some delay.
         if (data.bondsSecondMechanic === 'stack')
           return output.spreadThenStack!({
-            player1: data.ShortName(data.tetradaemonicTarget[0]),
-            player2: data.ShortName(data.tetradaemonicTarget[1]),
+            player1: data.party.member(data.tetradaemonicTarget[0]),
+            player2: data.party.member(data.tetradaemonicTarget[1]),
           });
         if (data.bondsSecondMechanic === 'partners')
           return output.spreadThenPartners!();
@@ -558,8 +558,8 @@ const triggerSet: TriggerSet<Data> = {
         // If this is undefined, then this is the second mechanic and will be called out elsewhere.
         if (data.bondsSecondMechanic === 'spread')
           return output.stackThenSpread!({
-            player1: data.ShortName(data.tetradaemonicTarget[0]),
-            player2: data.ShortName(data.tetradaemonicTarget[1]),
+            player1: data.party.member(data.tetradaemonicTarget[0]),
+            player2: data.party.member(data.tetradaemonicTarget[1]),
           });
       },
       outputStrings: {
@@ -589,8 +589,8 @@ const triggerSet: TriggerSet<Data> = {
           return output.partners!();
         if (data.bondsSecondMechanic === 'stack')
           return output.stack!({
-            player1: data.ShortName(data.tetradaemonicTarget[0]),
-            player2: data.ShortName(data.tetradaemonicTarget[1]),
+            player1: data.party.member(data.tetradaemonicTarget[0]),
+            player2: data.party.member(data.tetradaemonicTarget[1]),
           });
       },
       run: (data) => delete data.bondsSecondMechanic,
@@ -799,6 +799,42 @@ const triggerSet: TriggerSet<Data> = {
         'Touchdown': '空降',
         'Ultima': '究极',
         'Wicked Step': '尖脚',
+      },
+    },
+    {
+      'locale': 'ko',
+      'replaceSync': {
+        'Arcane Sphere': '입체마법진',
+        'Pand(?:\\\\u00e6|\u00e6)moniac Pillar': '마의 전당 탑',
+        'Pand(?:\\\\u00e6|\u00e6)monium': '판데모니움',
+      },
+      'replaceText': {
+        '\\(cast\\)': '(시전)',
+        '\\(cone\\)': '(부채꼴)',
+        '\\(knockback\\)': '(넉백)',
+        '\\(share\\)': '(쉐어)',
+        'Bury': '충격',
+        'Circles of Pandaemonium': '판데모니움 고리',
+        'Dividing Wings': '날개 분리',
+        'Daemoniac Bonds': '판데모니움 결속',
+        'Entangling Web': '거대 거미줄',
+        'Harrowing Hell': '판데모니움 격돌',
+        'Jade Passage': '제이드 통로',
+        'Pandaemoniac Meltdown': '판데모니움 멜튼',
+        'Pandaemoniac Pillars': '판데모니움 기둥',
+        'Pandaemoniac Ray': '판데모니움 광선',
+        'Pandaemoniac Turrets': '판데모니움 포탑',
+        'Pandaemoniac Web': '판데모니움 거미줄',
+        'Pandaemon\'s Holy': '판데모니움 홀리',
+        'Parted Plumes': '깃털 분리',
+        'Peal of Condemnation': '형벌 선포',
+        'Peal of Damnation': '천벌 선포',
+        'Silkspit': '거미줄 뱉기',
+        'Soul Grasp': '영혼 장악',
+        'Steel Web': '강력 거미줄',
+        'Touchdown': '착지',
+        'Ultima': '알테마',
+        'Wicked Step': '뾰족다리',
       },
     },
   ],

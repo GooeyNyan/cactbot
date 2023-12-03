@@ -2,6 +2,7 @@ import { Lang } from '../../resources/languages';
 import UserConfig, { ConfigValue } from '../../resources/user_config';
 import { BaseOptions, RaidbossData } from '../../types/data';
 import { Matches } from '../../types/net_matches';
+import { PartyMemberParamObjectKeys, PartyTrackerOptions } from '../../types/party';
 import {
   LooseTriggerSet,
   TriggerAutoConfig,
@@ -97,10 +98,12 @@ const defaultRaidbossConfigOptions = {
   TimelineLanguage: undefined as (Lang | undefined),
   TimelineEnabled: true,
   AlertsEnabled: true,
+  DefaultPlayerLabel: 'nick' as PartyMemberParamObjectKeys,
   ShowTimerBarsAtSeconds: 30,
   KeepExpiredTimerBarsForSeconds: 0.7,
   BarExpiresSoonSeconds: 6,
   MaxNumberOfTimerBars: 6,
+  ReverseTimeline: false,
   DisplayAlarmTextForSeconds: 3,
   DisplayAlertTextForSeconds: 3,
   DisplayInfoTextForSeconds: 3,
@@ -123,7 +126,7 @@ const defaultRaidbossConfigOptions = {
 type RaidbossConfigOptions = typeof defaultRaidbossConfigOptions;
 
 export interface RaidbossOptions
-  extends BaseOptions, RaidbossNonConfigOptions, RaidbossConfigOptions {}
+  extends BaseOptions, RaidbossNonConfigOptions, RaidbossConfigOptions, PartyTrackerOptions {}
 
 // See user/raidboss-example.js for documentation.
 const Options: RaidbossOptions = {

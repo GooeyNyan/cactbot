@@ -39,7 +39,6 @@ type ExcludedLineDocs =
   | 'None'
   | 'NetworkAOEAbility'
   | 'NetworkWorld'
-  | 'NetworkEffectResult'
   | 'ParserInfo'
   | 'ProcessInfo'
   | 'Debug'
@@ -173,8 +172,8 @@ const lineDocs: LineDocs = {
   },
   AddedCombatant: {
     regexes: {
-      network: NetRegexes.addedCombatantFull({ capture: true }).source,
-      logLine: Regexes.addedCombatantFull({ capture: true }).source,
+      network: NetRegexes.addedCombatant({ capture: true }).source,
+      logLine: Regexes.addedCombatant({ capture: true }).source,
     },
     examples: {
       'en-US': [
@@ -237,8 +236,8 @@ const lineDocs: LineDocs = {
   },
   Ability: {
     regexes: {
-      network: NetRegexes.abilityFull({ capture: true }).source,
-      logLine: Regexes.abilityFull({ capture: true }).source,
+      network: NetRegexes.ability({ capture: true }).source,
+      logLine: Regexes.ability({ capture: true }).source,
     },
     examples: {
       'en-US': [
@@ -396,6 +395,15 @@ const lineDocs: LineDocs = {
       ],
     },
   },
+  NetworkEffectResult: {
+    examples: {
+      'en-US': [
+        '37|2023-10-31T10:08:51.4080000-07:00|10FF0001|Tini Poutini|0000003A|117941|117941|10000|10000|0||-660.17|-842.23|29.75|-1.61|1500|0|0|01|5B|0|0|10755CA3|19aff167ea86b371',
+        '37|2023-10-31T22:11:04.8350000-07:00|10FF0002|Potato Chippy|00005AE1|0|88095|0|10000|0||8.61|15.22|0.00|2.69|1E00|0|0|01|0400002C|0|0|E0000000|ef1e0399980c0f47',
+        '37|2023-10-31T22:10:49.5860000-07:00|4000C5B2|Ketuduke|00005AD6|7452804||||||-0.02|-0.02|0.00|1.98|27ee18f38f377d5d',
+      ],
+    },
+  },
   StatusEffect: {
     regexes: {
       network: NetRegexes.statusEffectExplicit({ capture: true }).source,
@@ -496,9 +504,9 @@ const lineDocs: LineDocs = {
   InCombat: {
     examples: {
       'en-US': [
-        '260|2023-01-03T10:17:15.8240000-08:00|0|0|7da9e0cfed11abfe',
-        '260|2023-01-03T17:51:42.9680000-08:00|1|0|ae12d0898d923251',
-        '260|2023-01-03T17:54:50.0680000-08:00|1|1|3ba06c97a4cbbf42',
+        '260|2023-01-03T10:17:15.8240000-08:00|0|0|1|1|7da9e0cfed11abfe',
+        '260|2023-01-03T17:51:42.9680000-08:00|1|0|0|1|ae12d0898d923251',
+        '260|2023-01-03T17:54:50.0680000-08:00|1|1|1|0|3ba06c97a4cbbf42',
       ],
     },
   },
@@ -517,6 +525,33 @@ const lineDocs: LineDocs = {
         '262|2023-04-21T23:24:05.8320000-04:00|en|0000001C|_rsv_32789_-1_1_0_1_SE2DC5B04_EE2DC5B04|Run: ****mi* (Omega Version)|34159b6f2093e889',
         '262|2023-04-21T23:24:05.9210000-04:00|en|00000031|_rsv_3448_-1_1_1_0_S74CFC3B0_E74CFC3B0|Burning with dynamis inspired by Omega\'s passion.|ce9d03bb211d894f',
         '262|2023-04-21T23:24:06.0630000-04:00|en|00000051|_rsv_35827_-1_1_0_0_S13095D61_E13095D61|Further testing is required.�����,\\r���)������ ��, assist me with this evaluation.|38151741aad7fe51',
+      ],
+    },
+  },
+  // These examples are pairs of 263/264 lines showing the three cases
+  StartsUsingExtra: {
+    examples: {
+      'en-US': [
+        // Case 1, no actual ground target info, so the values sent in the packet correspond
+        // to the actor's position and heading
+        '263|2023-11-02T20:53:52.1900000-04:00|10001234|0005|-98.697|-102.359|10.010|1.524|dd76513d3dd59f5a',
+        // Case 2, no actual ground target info, but has a heading for some reason
+        '263|2023-11-02T21:39:18.6200000-04:00|10001234|0085|-6.653|747.154|130.009|2.920|39e0326a5ee47b77',
+        // Case 3, valid position and heading
+        '263|2023-11-02T21:39:12.6940000-04:00|40000D6E|8C45|-14.344|748.558|130.009|-3.142|9c7e421d4e93de7c',
+      ],
+    },
+  },
+  AbilityExtra: {
+    examples: {
+      'en-US': [
+        // Case 1, because there was no ground target info and no heading,
+        // the ability target info is blank
+        '264|2023-11-02T20:53:56.6450000-04:00|10001234|0005|000003EF|0|||||9f7371fa0e3a42c8',
+        // Case 2, because the ability has a heading, `0` gets sent for x/y/z with a proper heading
+        '264|2023-11-02T21:39:20.0910000-04:00|10001234|0085|0000533E|1|0.000|0.000|0.000|2.920|2e9ae29c1b65f930',
+        // Case 3, valid position and heading
+        '264|2023-11-02T21:39:15.6790000-04:00|40000D6E|8C45|000052DD|1|-14.344|748.558|130.009|2.483|f6b3ffa6c97f0540',
       ],
     },
   },

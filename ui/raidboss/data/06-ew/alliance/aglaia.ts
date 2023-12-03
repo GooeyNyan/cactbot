@@ -400,7 +400,7 @@ const triggerSet: TriggerSet<Data> = {
       alertText: (data, matches, output) => {
         if (data.naldSmeltingSpread.includes(data.me))
           return;
-        return output.stackOnPlayer!({ player: data.ShortName(matches.target) });
+        return output.stackOnPlayer!({ player: data.party.member(matches.target) });
       },
       run: (data) => data.naldSmeltingSpread = [],
       outputStrings: {
@@ -494,7 +494,7 @@ const triggerSet: TriggerSet<Data> = {
       delaySeconds: 0.5,
       alertText: (data, matches, output) => {
         if (data.naldLastColor === 'orange')
-          return output.lineStackOn!({ player: data.ShortName(matches.target) });
+          return output.lineStackOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         lineStackOn: {
@@ -904,7 +904,6 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'ja',
-      'missingTranslations': true,
       'replaceSync': {
         'Azeyma(?!\')': 'アーゼマ',
         'Azeyma\'s Heat': 'アーゼマの蜃気楼',
@@ -929,6 +928,7 @@ const triggerSet: TriggerSet<Data> = {
         'The Twin Halls': '二面宮',
       },
       'replaceText': {
+        '--hammer--': '--ハンマー--',
         'Advent of the Eighth': '彗星輪',
         'As Above, So Below': '死生択一の炎',
         'Balance': '魂の清算',

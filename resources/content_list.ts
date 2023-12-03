@@ -116,22 +116,6 @@ const contentList: (ZoneIdType)[] = [
   ZoneId.TheAetherfont,
   ZoneId.TheLunarSubterrane,
 
-  // Guildhests
-  ZoneId.BasicTrainingEnemyParties,
-  ZoneId.UnderTheArmor,
-  ZoneId.BasicTrainingEnemyStrongholds,
-  ZoneId.HeroOnTheHalfShell,
-  ZoneId.PullingPoisonPosies,
-  ZoneId.StingingBack,
-  ZoneId.AllsWellThatEndsInTheWell,
-  ZoneId.FlickingSticksAndTakingNames,
-  ZoneId.MoreThanAFeeler,
-  ZoneId.AnnoyTheVoid,
-  ZoneId.ShadowAndClaw,
-  ZoneId.LongLiveTheQueen,
-  ZoneId.WardUp,
-  ZoneId.SolemnTrinity,
-
   // Trials (A Realm Reborn)
   ZoneId.TheBowlOfEmbers,
   ZoneId.TheNavel,
@@ -413,6 +397,9 @@ const contentList: (ZoneIdType)[] = [
   ZoneId.MountRokkon,
   ZoneId.AnotherMountRokkon,
   ZoneId.AnotherMountRokkonSavage,
+  ZoneId.AloaloIsland,
+  ZoneId.AnotherAloaloIsland,
+  ZoneId.AnotherAloaloIslandSavage,
 
   // Ultimate Raids
   ZoneId.TheUnendingCoilOfBahamutUltimate,

@@ -18,6 +18,7 @@ export interface Data extends RaidbossData {
   miasmicBlasts: PluginCombatantState[];
   busterPlayers: string[];
   forkedPlayers: string[];
+  bigBangStackPlayer?: string;
   blackHolePlayer?: string;
   flareMechanic?: 'spread' | 'stack';
   noxPlayers: string[];
@@ -94,7 +95,10 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Heal to full',
           de: 'Voll heilen',
+          fr: 'Soin complet',
+          ja: 'HPを満タンに',
           cn: '奶满全队',
+          ko: '체력 풀피로',
         },
       },
     },
@@ -107,18 +111,24 @@ const triggerSet: TriggerSet<Data> = {
         data.seenSableThread = true;
         if (matches.target === data.me)
           return output.lineStackOnYou!({ num: num });
-        return output.lineStackOn!({ num: num, player: data.ShortName(matches.target) });
+        return output.lineStackOn!({ num: num, player: data.party.member(matches.target) });
       },
       outputStrings: {
         lineStackOn: {
           en: '${num}x line stack on ${player}',
           de: '${num}x in einer Linie sammeln mit ${player}',
+          fr: 'Package en ligne ${num}x sur ${player}',
+          ja: '${num}x 直線頭割り (${player})',
           cn: '${num}x 直线分摊 (${player})',
+          ko: '${num}x 직선 쉐어 (${player})',
         },
         lineStackOnYou: {
           en: '${num}x line stack on YOU',
           de: '${num}x in einer Linie sammeln mit DIR',
+          fr: 'Package en ligne ${num}x sur VOUS',
+          ja: '自分に${num}x 直線頭割り',
           cn: '${num}x 直线分摊点名',
+          ko: '${num}x 직선 쉐어 대상자',
         },
       },
     },
@@ -167,7 +177,10 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: '${dir1} / ${dir2}',
           de: '${dir1} / ${dir2}',
+          fr: '${dir1} / ${dir2}',
+          ja: '${dir1} / ${dir2}',
           cn: '${dir1} / ${dir2}',
+          ko: '${dir1} / ${dir2}',
         },
         ne: Outputs.northeast,
         sw: Outputs.southwest,
@@ -184,7 +197,10 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: '${dir1} / ${dir2}',
           de: '${dir1} / ${dir2}',
+          fr: '${dir1} / ${dir2}',
+          ja: '${dir1} / ${dir2}',
           cn: '${dir1} / ${dir2}',
+          ko: '${dir1} / ${dir2}',
         },
         nw: Outputs.northwest,
         se: Outputs.southeast,
@@ -277,31 +293,58 @@ const triggerSet: TriggerSet<Data> = {
         avoidUnknown: {
           en: 'Avoid Line Cleaves',
           de: 'Weiche den Linien Cleaves aus',
+          fr: 'Évitez les cleaves en ligne',
+          ja: '直線AOE回避',
           cn: '远离十字AOE',
+          ko: '직선 장판 피하기',
         },
         dirNNE: {
           en: 'North Wall (NNE/WSW)',
+          de: 'Nördliche Wand (NNO/WSW)',
+          fr: 'Mur Nord (NNE/OSO)',
+          ja: '1時・8時',
           cn: '右上前方/左下侧边',
+          ko: '1시/8시',
         },
         dirNNW: {
           en: 'North Wall (NNW/ESE)',
+          de: 'Nördliche Wand (NNW/OSO)',
+          fr: 'Mur Nord (NNO/ESE)',
+          ja: '11時・4時',
           cn: '左上前方/右下侧边',
+          ko: '11시/4시',
         },
         dirNE: {
           en: 'Corners (NE/SW)',
+          de: 'Ecken (NO/SW)',
+          fr: 'Coins (NE/SO)',
+          ja: '隅へ (北東・南西)',
           cn: '右上/左下角落',
+          ko: '구석 (북동/남서)',
         },
         dirNW: {
           en: 'Corners (NW/SE)',
+          de: 'Ecken (NW/SO)',
+          fr: 'Coins (NO/SE)',
+          ja: '隅へ (北西・南東)',
           cn: '左上/右下角落',
+          ko: '구석 (북서/남동)',
         },
         dirENE: {
           en: 'East Wall (ENE/SSW)',
+          de: 'Östliche Wand (ONO/SSW)',
+          fr: 'Mur Est (ENE/SSO)',
+          ja: '2時・7時',
           cn: '右上侧边/左下后方',
+          ko: '2시/7시',
         },
         dirWNW: {
           en: 'West Wall (WNW/SSE)',
+          de: 'Westliche Wand (WNW/SSO)',
+          fr: 'Mur Ouest (ONO/SSE)',
+          ja: '10時・5時',
           cn: '左上侧边/右下后方',
+          ko: '10시/5시',
         },
       },
     },
@@ -326,17 +369,33 @@ const triggerSet: TriggerSet<Data> = {
         forkedLightning: {
           en: 'Spread (forked lightning)',
           de: 'Verteilen (Gabelblitz)',
+          fr: 'Écartez-vous (Éclair ramifié)',
+          ja: '散会 (自分にAOE)',
           cn: '分散（闪电点名）',
+          ko: '산개',
         },
       },
     },
     {
-      id: 'ZeromusEx The Dark Beckons Stack',
+      id: 'ZeromusEx The Dark Beckons Stack Collect',
       type: 'HeadMarker',
       netRegex: { id: headmarkerMap.stack },
       condition: (data) => data.phase === 'one',
-      // Wait to collect tank markers.
-      delaySeconds: 0.5,
+      run: (data, matches) => data.bigBangStackPlayer = matches.target,
+    },
+    {
+      id: 'ZeromusEx The Dark Beckons Stack',
+      type: 'HeadMarker',
+      netRegex: { id: [headmarkerMap.stack, headmarkerMap.tankBuster] },
+      condition: (data) => {
+        if (data.phase !== 'one')
+          return false;
+        return data.bigBangStackPlayer !== undefined;
+      },
+      // If we have both busters, run immediately otherwise wait a reasonable amount of time
+      // for them to show up.
+      delaySeconds: (data) => data.busterPlayers.length === 2 ? 0 : 1,
+      suppressSeconds: 10,
       alertText: (data, matches, output) => {
         if (data.busterPlayers.includes(data.me))
           return;
@@ -344,7 +403,7 @@ const triggerSet: TriggerSet<Data> = {
           return;
         if (data.me === matches.target)
           return output.stackOnYou!();
-        return output.stackOnTarget!({ player: data.ShortName(matches.target) });
+        return output.stackOnTarget!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         stackOnYou: Outputs.stackOnYou,
@@ -369,7 +428,10 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Group middle for tethers',
           de: 'Gruppe in die Mitte für Verbindungen',
+          fr: 'Groupe au centre pour les liens',
+          ja: '真ん中で線連結を待つ',
           cn: '集合等待连线',
+          ko: '중앙에 모여서 사슬 연결 기다리기',
         },
       },
     },
@@ -381,12 +443,13 @@ const triggerSet: TriggerSet<Data> = {
       suppressSeconds: 10,
       alertText: (data, matches, output) => {
         const partner = matches.source === data.me ? matches.target : matches.source;
-        return output.breakTether!({ partner: data.ShortName(partner) });
+        return output.breakTether!({ partner: data.party.member(partner) });
       },
       outputStrings: {
         breakTether: {
           en: 'Break tether (w/ ${partner})',
           de: 'Verbindung brechen (mit ${partner})',
+          fr: 'Cassez le lien (avec ${partner})',
           ja: '線切る (${partner})',
           cn: '拉断连线 (和 ${partner})',
           ko: '선 끊기 (+ ${partner})',
@@ -414,7 +477,10 @@ const triggerSet: TriggerSet<Data> = {
         blackHole: {
           en: 'East Black Hole on Wall',
           de: 'Schwarzes Loch an die östliche Wand',
+          fr: 'Trou noir Est sur Mur',
+          ja: '右にブラックホール',
           cn: '右上放置黑洞',
+          ko: '오른쪽 구석에 블랙홀 놓기',
         },
       },
     },
@@ -433,7 +499,10 @@ const triggerSet: TriggerSet<Data> = {
         blackHole: {
           en: 'West Black Hole on Wall',
           de: 'Schwarzes Loch an die westliche Wand',
+          fr: 'Trou noir Ouest sur Mur',
+          ja: '左にブラックホール',
           cn: '左上放置黑洞',
+          ko: '왼쪽 구석에 블랙홀 놓기',
         },
       },
     },
@@ -454,7 +523,10 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Get Towers => Spread',
           de: 'Türme nehmen => Verteilen',
+          fr: 'Prenez les tours -> Écartez-vous',
+          ja: '塔踏み => 散会',
           cn: '踩塔 => 分散',
+          ko: '기둥 밟기 => 산개',
         },
       },
     },
@@ -469,7 +541,10 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Get Towers => Partner Stacks',
           de: 'Türme nehmen => mit Partner sammeln',
+          fr: 'Prenez les tours -> Partenaires',
+          ja: '塔踏み => ペア',
           cn: '踩塔 => 分摊',
+          ko: '기둥 밟기 => 2인 쉐어',
         },
       },
     },
@@ -491,12 +566,18 @@ const triggerSet: TriggerSet<Data> = {
         stackWithNox: {
           en: 'Partner Stack + Chasing Nox',
           de: 'Mit Partner Sammeln + verfolgendes Nox',
+          fr: 'Package partenaires + Nox',
+          ja: 'ペア + ついてくるAOE',
           cn: '分摊 + 步进点名',
+          ko: '2인 쉐어 + 따라오는 장판',
         },
         spreadWithNox: {
           en: 'Spread + Chasing Nox',
           de: 'Verteilen + verfolgendes Nox',
+          fr: 'Écartez-vous + Nox',
+          ja: '散会 + ついてくるAOE',
           cn: '分散 + 步进点名',
+          ko: '산개 + 따라오는 장판',
         },
       },
     },
@@ -504,7 +585,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'ZeromusEx Flare Mechanic No Nox',
       type: 'HeadMarker',
       netRegex: { id: headmarkerMap.nox, capture: false },
-      delaySeconds: 0.5,
+      delaySeconds: (data) => data.noxPlayers.length === 2 ? 0 : 0.5,
       suppressSeconds: 5,
       alertText: (data, _matches, output) => {
         if (data.noxPlayers.includes(data.me))
@@ -518,12 +599,18 @@ const triggerSet: TriggerSet<Data> = {
         stack: {
           en: 'Partner Stack',
           de: 'mit Partner sammeln',
+          fr: 'Package avec partenaire',
+          ja: 'ペア',
           cn: '分摊',
+          ko: '2인 쉐어',
         },
         spread: {
           en: 'Spread',
           de: 'Verteilen',
+          fr: 'Écartez-vous',
+          ja: '散会',
           cn: '分散',
+          ko: '산개',
         },
       },
     },
@@ -565,17 +652,26 @@ const triggerSet: TriggerSet<Data> = {
         north: {
           en: 'Out of North',
           de: 'Weg vom Norden',
+          fr: 'En dehors du Nord',
+          ja: '北危険',
           cn: '远离北边',
+          ko: '북쪽 피하기',
         },
         middle: {
           en: 'Out of Middle',
           de: 'Weg von der Mitte',
+          fr: 'En dehors du milieu',
+          ja: '中央危険',
           cn: '远离中间',
+          ko: '중앙 피하기',
         },
         south: {
           en: 'Out of South',
           de: 'Weg vom Süden',
+          fr: 'En dehors du Sud',
+          ja: '南危険',
           cn: '远离南边',
+          ko: '남쪽 피하기',
         },
       },
     },
@@ -595,17 +691,26 @@ const triggerSet: TriggerSet<Data> = {
         northSpread: {
           en: 'Spread Middle/South',
           de: 'Verteilen Mitte/Süden',
+          fr: 'Écartez-vous Milieu/Sud',
+          ja: '中央・南で散会',
           cn: '中间/南边 分散',
+          ko: '중앙/남쪽으로 산개',
         },
         middleSpread: {
           en: 'Spread North/South',
           de: 'Verteilen Norden/Süden',
+          fr: 'Écartez-vous Nord/Sud',
+          ja: '北・南で散会',
           cn: '北边/南边 分散',
+          ko: '북쪽/남쪽으로 산개',
         },
         southSpread: {
           en: 'Spread North/Middle',
           de: 'Verteilen Norden/Mitte',
+          fr: 'Écartez-vous Nord/Milieu',
+          ja: '北・中央で散会',
           cn: '北边/中间 分散',
+          ko: '북쪽/중앙으로 산개',
         },
       },
     },
@@ -639,17 +744,26 @@ const triggerSet: TriggerSet<Data> = {
         northEnumeration: {
           en: 'Enumeration Middle/South',
           de: 'Enumeration Mitte/Süden',
+          fr: 'Énumération Milieu/Sud',
+          ja: '中央・南でエアーバンプ',
           cn: '中间/南边 蓝圈分摊',
+          ko: '2인 장판 중앙/남쪽',
         },
         middleEnumeration: {
           en: 'Enumeration North/South',
           de: 'Enumeration Norden/Süden',
+          fr: 'Énumération Nord/Sud',
+          ja: '北・南でエアーバンプ',
           cn: '北边/南边 蓝圈分摊',
+          ko: '2인 장판 북쪽/남쪽',
         },
         southEnumeration: {
           en: 'Enumeration North/Middle',
           de: 'Enumeration Norden/Mitte',
+          fr: 'Énumération Nord/Milieu',
+          ja: '北・中央でエアーバンプ',
           cn: '北边/中间 蓝圈分摊',
+          ko: '2인 장판 북쪽/중앙',
         },
       },
     },
@@ -669,17 +783,26 @@ const triggerSet: TriggerSet<Data> = {
         northStack: {
           en: 'Stack Middle',
           de: 'Mittig sammeln',
+          fr: 'Packez-vous au milieu',
+          ja: '中央で頭割り',
           cn: '中间分摊',
+          ko: '중앙에서 쉐어',
         },
         middleStack: {
           en: 'Stack North',
           de: 'Nördlich sammeln',
+          fr: 'Packez-vous au Nord',
+          ja: '北で頭割り',
           cn: '北边分摊',
+          ko: '북쪽에서 쉐어',
         },
         southStack: {
           en: 'Stack North/Middle',
           de: 'Nördlich/Mittig sammeln',
+          fr: 'Packez-vous au Nord/milieu',
+          ja: '北・中央で頭割り',
           cn: '北边/中间 分摊',
+          ko: '북쪽/중앙에서 쉐어',
         },
       },
     },
@@ -788,13 +911,14 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'ja',
-      'missingTranslations': true,
       'replaceSync': {
         'Comet': 'コメット',
         'Toxic Bubble': 'ポイズナスバブル',
         'Zeromus': 'ゼロムス',
       },
       'replaceText': {
+        '--spread--': '--散会--',
+        '--towers--': '--塔--',
         'Abyssal Echoes': 'アビサルエコー',
         'Abyssal Nox': 'アビサルノックス',
         'Akh Rhai': 'アク・ラーイ',

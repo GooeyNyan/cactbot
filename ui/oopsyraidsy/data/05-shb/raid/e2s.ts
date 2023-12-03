@@ -16,8 +16,8 @@ const triggerSet: OopsyTriggerSet<Data> = {
   zoneId: ZoneId.EdensGateDescentSavage,
   damageWarn: {
     'E2S Doomvoid Slicer': '3E50',
-    'E3S Empty Rage': '3E6C',
-    'E3S Doomvoid Guillotine': '3E4F',
+    'E2S Empty Rage': '3E6C',
+    'E2S Doomvoid Guillotine': '3E4F',
   },
   shareWarn: {
     'E2S Doomvoid Cleaver': '3E64',
@@ -40,7 +40,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'E2S Nyx',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '3E51', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '3E51', ...playerDamageFields }),
       mistake: (_data, matches) => {
         return {
           type: 'warn',

@@ -146,18 +146,11 @@ const contentTypeToLabel: { [contentType: number]: LocaleText } = {
     cn: '迷宫挑战',
     ko: '던전',
   },
-  [ContentType.Guildhests]: {
-    en: 'Hest',
-    de: 'Gldgh',
-    fr: 'Op. Guilde',
-    ja: 'ギルド',
-    cn: '行会令',
-    ko: '길드작전',
-  },
   [ContentType.VCDungeonFinder]: {
     en: 'V&C',
     de: 'Gewölbesuche',
     fr: 'Donjon V&C',
+    ja: 'ヴァリアント&アナザーダンジョン',
     cn: '多变&异闻迷宫',
     ko: '변형&파생던전',
   },
@@ -168,7 +161,6 @@ const contentTypeLabelOrder = [
   ContentType.Raids,
   ContentType.Trials,
   ContentType.Dungeons,
-  ContentType.Guildhests,
 ] as const;
 
 // This is also the order of the table columns.
@@ -225,6 +217,7 @@ const zoneGridHeaders = {
     en: 'Translated',
     de: 'Übersetzt',
     fr: 'Traduit',
+    ja: '翻訳済',
     cn: '已翻译',
     ko: '번역됨',
   },
@@ -284,6 +277,7 @@ const translationGridHeaders = {
     en: 'Translations',
     de: 'Übersetzungen',
     fr: 'Traductions',
+    ja: '翻訳',
     cn: '翻译',
     ko: '번역',
   },
@@ -291,6 +285,7 @@ const translationGridHeaders = {
     en: 'Coverage',
     de: 'Abdeckung',
     fr: 'Couvert',
+    ja: '適用範囲',
     cn: '覆盖率',
     ko: '커버리지',
   },
@@ -298,13 +293,21 @@ const translationGridHeaders = {
     en: 'Errors',
     de: 'Fehler',
     fr: 'Erreurs',
+    ja: 'エラー',
     cn: '错误',
     ko: '오류',
+  },
+  missingFiles: {
+    en: 'Missing',
+    ja: '欠落',
+    cn: '缺失',
+    ko: '누락됨',
   },
   url: {
     en: 'Link to Missing Translation List',
     de: 'Link zur Liste mit den fehlenden Übersetzungen',
     fr: 'Lien vers la liste des traductions manquantes',
+    ja: '欠落している翻訳のリストへのリンク',
     cn: '缺失翻译表链接',
     ko: '번역 누락 리스트 링크',
   },
@@ -365,13 +368,10 @@ const buildExpansionGrid = (container: HTMLElement, lang: Lang, totals: Coverage
 const buildTranslationGrid = (
   container: HTMLElement,
   thisLang: Lang,
-  totals: CoverageTotals,
   translationTotals: TranslationTotals,
 ) => {
   for (const header of Object.values(translationGridHeaders))
     addDiv(container, 'label', translate(header, thisLang));
-
-  const totalZones = totals.overall.raidboss;
 
   for (const lang of languages) {
     if (lang === 'en')
@@ -380,9 +380,12 @@ const buildTranslationGrid = (
     const url = `missing_translations_${lang}.html`;
     const aHref = `<a href="${url}">${url}</a>`;
 
+    const langTotals = translationTotals[lang];
+
     addDiv(container, 'text', translate(langMap, thisLang)[lang]);
-    addDiv(container, 'data', `${translationTotals[lang].files} / ${totalZones}`);
-    addDiv(container, 'data', `${translationTotals[lang].errors}`);
+    addDiv(container, 'data', `${langTotals.translatedFiles} / ${langTotals.totalFiles}`);
+    addDiv(container, 'data', `${langTotals.errors}`);
+    addDiv(container, 'data', `${langTotals.missingFiles === 0 ? '' : langTotals.missingFiles}`);
     addDiv(container, 'text', aHref);
   }
 };
@@ -552,7 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const translationGrid = document.getElementById('translation-grid');
   if (!translationGrid)
     throw new UnreachableCode();
-  buildTranslationGrid(translationGrid, lang, coverageTotals, translationTotals);
+  buildTranslationGrid(translationGrid, lang, translationTotals);
 
   const zoneGrid = document.getElementById('zone-grid');
   if (!zoneGrid)

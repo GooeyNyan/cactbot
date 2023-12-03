@@ -191,6 +191,7 @@ const kDirectoryToCategory = {
     en: 'Hunts & FATEs',
     de: 'Hohe Jagd & FATEs',
     fr: 'Chasse & Aléas',
+    ja: 'モブハント & フェイト',
     cn: '怪物狩猎 & 危命任务',
     ko: '마물 & 돌발',
   },
@@ -198,6 +199,7 @@ const kDirectoryToCategory = {
     en: 'Treasure Map',
     de: 'Schatzkarten',
     fr: 'Cartes au trésor',
+    ja: '宝箱地図',
     cn: '宝物地图',
     ko: '보물 지도',
   },
@@ -205,6 +207,7 @@ const kDirectoryToCategory = {
     en: 'Deep Dungeon',
     de: 'Tiefes Gewölbe',
     fr: 'Donjon sans fond',
+    ja: 'ディープダンジョン',
     cn: '深层迷宫',
     ko: '딥 던전',
   },
@@ -578,6 +581,8 @@ export class CactbotConfigurator {
     container.appendChild(collapser);
 
     const a = document.createElement('a');
+    // TODO: fix me
+    /* eslint-disable-next-line deprecation/deprecation */
     a.name = group;
     collapser.appendChild(a);
 
@@ -920,6 +925,10 @@ export class CactbotConfigurator {
       let title = '???';
       let zoneId: number | undefined = undefined;
       let zoneLabel: LocaleText | undefined = undefined;
+
+      /* eslint-disable-next-line deprecation/deprecation */
+      const origZoneRegex = triggerSet.zoneRegex;
+
       // if a zoneLabel is set, use for the title
       if (triggerSet.zoneLabel) {
         zoneLabel = triggerSet.zoneLabel;
@@ -932,11 +941,11 @@ export class CactbotConfigurator {
           title = this.translate(zoneInfo.name);
       } else if (triggerSet.zoneId === null) {
         title = this.translate(kPrefixToCategory['00-misc']);
-      } else if (triggerSet.zoneRegex) {
+      } else if (origZoneRegex) {
         // zoneRegex can be a localized object.
-        let zoneRegex = triggerSet.zoneRegex instanceof RegExp
-          ? triggerSet.zoneRegex
-          : triggerSet.zoneRegex[this.lang];
+        let zoneRegex = origZoneRegex instanceof RegExp
+          ? origZoneRegex
+          : origZoneRegex[this.lang];
         if (typeof zoneRegex === 'string')
           zoneRegex = Regexes.parse(zoneRegex);
         if (zoneRegex instanceof RegExp)

@@ -278,7 +278,7 @@ const triggerSet: TriggerSet<Data> = {
         if (tether.target === data.me)
           return { alarmText: output.upheldOnYou!() };
 
-        return { alertText: output.upheldOnPlayer!({ player: data.ShortName(tether.target) }) };
+        return { alertText: output.upheldOnPlayer!({ player: data.party.member(tether.target) }) };
       },
       run: (data) => data.upheldTethers = [],
     },
@@ -346,7 +346,7 @@ const triggerSet: TriggerSet<Data> = {
         if (tether.target === data.me)
           return { alarmText: output.tankTether!() };
         return {
-          alertText: output.partyStackPlayerOut!({ player: data.ShortName(tether.target) }),
+          alertText: output.partyStackPlayerOut!({ player: data.party.member(tether.target) }),
         };
       },
       run: (data) => data.upheldTethers = [],
@@ -736,7 +736,7 @@ const triggerSet: TriggerSet<Data> = {
         else
           myBuddyRole = output.unknown!();
 
-        const myBuddyShort = data.ShortName(myBuddy);
+        const myBuddyShort = data.party.member(myBuddy);
 
         let alertText: string;
         if (myLength === 'near') {
@@ -756,7 +756,7 @@ const triggerSet: TriggerSet<Data> = {
         const playerNames = Object.keys(data.lightDarkTether);
         const sameLength = playerNames.filter((x) => data.lightDarkTether[x] === myLength);
         const others = sameLength.filter((x) => x !== data.me && x !== myBuddy).sort();
-        const [player1, player2] = others.map((x) => data.ShortName(x));
+        const [player1, player2] = others.map((x) => data.party.member(x));
         if (player1 !== undefined && player2 !== undefined) {
           if (myLength === 'near')
             infoText = output.otherNear!({ player1: player1, player2: player2 });
@@ -1034,6 +1034,45 @@ const triggerSet: TriggerSet<Data> = {
         'Unlucky Lot': '魔爆',
         'Upheld Overruling': '维持否决',
         'Upheld Ruling': '维持判决',
+      },
+    },
+    {
+      'locale': 'ko',
+      'replaceSync': {
+        'Arcane Cylinder': '방향마법진',
+        'Arcane Sphere': '입체마법진',
+        'Illusory Themis': '테미스의 환영',
+        '(?<! )Themis': '테미스',
+      },
+      'replaceText': {
+        '\\(cast\\)': '(시전)',
+        'Arcane Revelation': '마법진 전개',
+        'Arche': '아르케',
+        'Blinding Light': '빛 폭탄',
+        'Dark Current': '암운의 격류',
+        'Dark Perimeter': '어둠의 둘레',
+        'Dark and Light': '빛과 어둠의 조정',
+        'Dike': '디케',
+        'Dismissal Overruling': '퇴거 강행',
+        'Divisive Overruling': '분할 강행',
+        'Divisive Ruling': '분할 집행',
+        'Emissary\'s Will': '조정',
+        'Eunomia': '에우노미아',
+        '(?<!Magie)Explosion': '폭발',
+        'Heart of Judgment': '형률의 파동',
+        'Inevitable Law': '추가 기소',
+        'Inevitable Sentence': '추가 선고',
+        'Jury Overruling': '배심 강행',
+        'Letter of the Law': '이법의 환영',
+        'Lightburst': '빛 분출',
+        'Lightstream': '빛의 급류',
+        'Shadowed Messengers': '계율의 환영',
+        'Styx': '스틱스',
+        'Twofold Revelation': '이중 마법진 전개',
+        'Ultimate Verdict': '궁극의 조정',
+        'Unlucky Lot': '마력 폭발',
+        'Upheld Overruling': '확정 강행',
+        'Upheld Ruling': '확정 집행',
       },
     },
   ],

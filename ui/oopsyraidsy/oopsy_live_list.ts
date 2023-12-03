@@ -1,10 +1,11 @@
 import { UnreachableCode } from '../../resources/not_reached';
 import { callOverlayHandler } from '../../resources/overlay_plugin_api';
+import PartyTracker from '../../resources/party';
 import { OopsyMistake } from '../../types/oopsy';
 
 import { DeathReport } from './death_report';
 import { MistakeObserver, ViewEvent } from './mistake_observer';
-import { GetFormattedTime, ShortNamify, Translate } from './oopsy_common';
+import { GetFormattedTime, Translate } from './oopsy_common';
 import { OopsyOptions } from './oopsy_options';
 
 const kCopiedMessage = {
@@ -20,6 +21,7 @@ const errorMessageEnableACTWS = {
   en: 'Plugins -> OverlayPlugin WSServer -> Stream/Local Overlay -> Start',
   de: 'Plugins -> OverlayPlugin WSServer -> Stream/Local Overlay -> Start',
   fr: 'Plugins -> OverlayPlugin WSServer -> Stream/Local Overlay -> Start',
+  ja: 'Plugins -> OverlayPlugin WSServer -> Stream/Local Overlay -> Start',
   cn: 'Plugins -> OverlayPlugin WSServer -> 直播/本地悬浮窗 -> 启用',
   ko: 'Plugins -> OverlayPlugin WSServer -> Stream/Local 오버레이 -> 시작',
 };
@@ -192,7 +194,11 @@ export class OopsyLiveList implements MistakeObserver {
   private deathReport?: DeathReportLive;
   private itemIdxToListener: { [itemIdx: number]: () => void } = {};
 
-  constructor(private options: OopsyOptions, private scroller: HTMLElement) {
+  constructor(
+    private options: OopsyOptions,
+    private scroller: HTMLElement,
+    private partyTracker: PartyTracker,
+  ) {
     const container = this.scroller.children[0];
     if (!container)
       throw new UnreachableCode();
@@ -273,7 +279,7 @@ export class OopsyLiveList implements MistakeObserver {
     const iconClass = m.type;
     const blame = m.name ?? m.blame;
     const blameText = blame !== undefined
-      ? `${ShortNamify(blame, this.options.PlayerNicks)}: `
+      ? `${this.partyTracker.member(blame).toString()}: `
       : '';
     const translatedText = Translate(this.options.DisplayLanguage, m.text);
     if (translatedText === undefined)
@@ -343,6 +349,8 @@ export class OopsyLiveList implements MistakeObserver {
       el.value = str;
       document.body.appendChild(el);
       el.select();
+      // TODO: fix me
+      /* eslint-disable-next-line deprecation/deprecation */
       document.execCommand('copy');
       document.body.removeChild(el);
 
